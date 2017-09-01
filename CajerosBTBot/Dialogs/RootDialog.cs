@@ -14,7 +14,7 @@ namespace CajerosBTBot.Dialogs
     public class RootDialog : IDialog<object>
     {
         
-
+        //Hola Diana :)
         public Task StartAsync(IDialogContext context)
         {
             context.Wait(MessageReceivedAsync);
