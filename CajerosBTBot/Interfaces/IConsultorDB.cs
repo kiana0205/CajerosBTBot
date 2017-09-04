@@ -16,6 +16,6 @@ namespace CajerosBTBot.Interfaces
         List<Cajero> obtenerEstatusCajerosEmpresa(string empresa);
 
 
-       // List<Cajero> obtenerHistoricoCajeroEmpresa(string fecha);
+        List<Cajero> obtenerHistoricoCajeroEmpresa(string fecha);
     }
 }

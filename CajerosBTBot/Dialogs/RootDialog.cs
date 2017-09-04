@@ -175,7 +175,7 @@ namespace CajerosBTBot.Dialogs
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new HeroCard
                     {
-                        Subtitle = cajeroBean.cajero,
+                        Subtitle = cajeroBean.conteo + " fallas",
                         Title = "El cajero " + cajero.ToUpper() + " tiene: ",
                         Images = new List<CardImage> {
                         new CardImage { Url = "http://nuevotiempo.org/radio/files/personas-con-signo-de-interrogacion-en-la-cara.jpg" }
