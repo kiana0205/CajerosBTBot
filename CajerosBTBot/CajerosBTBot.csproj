@@ -114,10 +114,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Bean\Cajero.cs" />
     <Compile Include="Bean\Empresa.cs" />
-    <Compile Include="Bean\Estatus.cs" />
     <Compile Include="Bean\LuisBean.cs" />
     <Compile Include="Bean\ResultadoTextAnalytics.cs" />
-    <Compile Include="Bean\TipoFalla.cs" />
+    <Compile Include="Bean\Tiempo.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Enums\EstadoDeAnimo.cs" />

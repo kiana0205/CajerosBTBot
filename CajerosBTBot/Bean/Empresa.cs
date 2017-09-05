@@ -16,5 +16,11 @@ namespace CajerosBTBot.Bean
 
         public string fecha { get; set; }
 
+        public string id_empresa { get; set; }
+
+        public string conteo { get; set; }
+
+
+
     }
 }

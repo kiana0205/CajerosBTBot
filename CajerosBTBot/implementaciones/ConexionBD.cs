@@ -119,14 +119,129 @@ namespace CajerosBTBot.implementaciones
 
 
 
-        public List<Cajero> obtenerHistoricoCajeroEmpresa(string fecha)
+        public List<Cajero> obtenerHistoricoCajeroEmpresa(string empresa)
         {
-            throw new NotImplementedException();
+            List<Cajero> cajeros = new List<Cajero>();
+            try
+            {
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
         }
 
-        public List<Cajero> obtenerEstatusCajerosEmpresa(string empresa)
+        public Boolean obtenerEstatusCajerosEmpresa(string empresa)
         {
-            throw new NotImplementedException();
+            Boolean est = false;
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+
+                    StringBuilder cn = new StringBuilder();
+                    cn.Append(" select count(*) from falla_f_fallas_diaria f ");
+                    cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    cn.Append(" where f.id_tipo_producto = 2");
+                    cn.Append(" and e.empresa like = '%" + empresa + "%'");
+                    cn.Append(" group by a.id_empresa ");
+                    String res = cn.ToString();
+                    SqlCommand comm = new SqlCommand(res, connection);
+                    Int32 count = (Int32)comm.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        est = true;
+
+                    }
+                    else
+                    {
+                        est = false;
+                    }
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return est;
+        }
+
+        public List<Empresa> ObtenerFallasEmpresa(string empresa)
+        {
+            List<Empresa> cajeros = new List<Empresa>();
+            try
+            {
+
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("SELECT ai.id_cajero as cajero, e.empresa, s.tipo_falla as tipoFalla, a.id_empresa, f.folio ");
+                    sb.Append("FROM falla_f_fallas_diaria f");
+                    sb.Append(" left join falla_d_fallas s on s.id_falla=f.id_falla ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_falla = f.id_falla");
+                    sb.Append(" where e.empresa like ='%" + empresa + "%'");
+                    sb.Append(" and f.id_tipo_producto = 2");
+                    sb.Append(" order by empresa asc, tipo_falla desc");
+                    // sb.Append("JOIN [SalesLT].[Product] p ");
+                    //sb.Append("ON pc.productcategoryid = p.productcategoryid;");
+                    String sql = sb.ToString();
+
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Empresa cajeroBean = new Empresa();
+
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.empresa = myReader["empresa"].ToString();
+                            cajeroBean.id_empresa = myReader["id_empresa"].ToString();
+                          //  cajeroBean.fecha = myReader["fecha"].ToString();
+                          // cajeroBean.conteo = myReader["conteo"].ToString();
+                            cajeroBean.tipoFalla = myReader["tipoFalla"].ToString();
+                            cajeroBean.folio = myReader["folio"].ToString();
+
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return cajeros;
         }
 
 

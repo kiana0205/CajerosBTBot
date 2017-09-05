@@ -89,7 +89,7 @@ namespace CajerosBTBot.Dialogs
                 case Intensiones.SolicitarHistoricoFallasCajero:
                     cajero = objetoLuis.Entidades[0].entity;
                     //var cajero = objetoLuis.Entidades[0].entity;
-                    //await MostrarEjecutivo(context, cajero);
+                    await SolicitarHistoricoCajero(context, cajero);
                     break;
 
                 default:
@@ -175,8 +175,9 @@ namespace CajerosBTBot.Dialogs
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new HeroCard
                     {
-                        Subtitle = cajeroBean.conteo + " fallas",
+                        Subtitle = cajeroBean.conteo + " falla(s)",
                         Title = "El cajero " + cajero.ToUpper() + " tiene: ",
+                        Text = "La falla(s) del cajero es(son) "+ cajeroBean.tipoFalla,
                         Images = new List<CardImage> {
                         new CardImage { Url = "http://nuevotiempo.org/radio/files/personas-con-signo-de-interrogacion-en-la-cara.jpg" }
                     }
@@ -213,7 +214,7 @@ namespace CajerosBTBot.Dialogs
 
                 var activity = context.MakeMessage();
 
-                activity.Text = "El cajero no tiene fallas";
+                activity.Text = "No se encontraron fallas en el cajero "+ cajero.ToUpper();
 
                 await context.PostAsync(activity);
 
@@ -226,6 +227,72 @@ namespace CajerosBTBot.Dialogs
         private async Task SolicitarEstatusCajerosEmpresa(IDialogContext context, string empresa)
         {
             IConsultorDB bd = new CajeroDaoImpl();
+            var estatus = bd.obtenerEstatusCajerosEmpresa(empresa.ToUpper());
+            if (estatus.Equals(true))
+            {
+                var empresas = bd.ObtenerFallasEmpresa(empresa.ToUpper());
+                if (empresas != null && empresas.Count > 0)
+                {
+                    Empresa cajeroBean = empresas[0];
+                    var activity = context.MakeMessage();
+                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard = new HeroCard
+                    {
+                        //Subtitle = cajeroBean.conteo + " falla(s)",
+                        Title = "La empresa " + empresa.ToUpper() + " tiene las siguientes fallas: ",
+                        Text = cajeroBean.cajero+"  "+ cajeroBean.empresa+" "+ cajeroBean.tipoFalla+"   "+ cajeroBean.folio,
+                        Images = new List<CardImage> {
+                        new CardImage { Url = "http://nuevotiempo.org/radio/files/personas-con-signo-de-interrogacion-en-la-cara.jpg" }
+                    }
+                    }.ToAttachment();
+
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                    await context.PostAsync(activity);
+
+                    await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar");
+                }
+                else
+                {
+                    var activity = context.MakeMessage();
+                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard = new HeroCard
+                    {
+                        Text = "Algo más en que le podamos ayudar",
+                        Subtitle = "Verifique el número de cajero",
+                        Title = "No se identifico el cajero como parte de banca transaccional",
+                        Images = new List<CardImage> {
+                        new CardImage { Url = "https://vignette2.wikia.nocookie.net/ageofempires/images/4/41/Signo_de_exclamaci%C3%B3n.png/revision/latest?cb=20120104172733&path-prefix=es" }
+                    }
+                    }.ToAttachment();
+
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                    await context.PostAsync(activity);
+
+                    //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar");
+                }
+
+
+            }
+            else
+            {
+
+                var activity = context.MakeMessage();
+
+                activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
+
+                await context.PostAsync(activity);
+
+                await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar");
+            }
+            context.Wait(MessageReceivedAsync);
+        }
+
+
+        private async Task SolicitarHistoricoCajero(IDialogContext context, string empresa) {
+            IConsultorDB bd = new CajeroDaoImpl();
+            var historico = bd.obtenerHistoricoCajeroEmpresa(empresa.ToUpper());
 
 
             context.Wait(MessageReceivedAsync);

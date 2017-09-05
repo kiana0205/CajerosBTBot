@@ -5,7 +5,8 @@ using System.Web;
 
 namespace CajerosBTBot.Bean
 {
-    public class TipoFalla
+    public class Tiempo
     {
+        public string tiempo { get; set; }
     }
 }
