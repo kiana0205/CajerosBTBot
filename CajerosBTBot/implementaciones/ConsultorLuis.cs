@@ -59,12 +59,14 @@ namespace CajerosBTBot.implementaciones
                     return Intensiones.SolicitarEstatusCajero;
                 case "SolicitarEstatusCajerosEmpresa":
                     return Intensiones.SolicitarEstatusCajerosEmpresa;
-                case "SolicitarFallasCajerosEmpresa":
-                    return Intensiones.SolicitarFallasCajerosEmpresa;
-                case "SolicitarHistoricoFallasCajero":
-                    return Intensiones.SolicitarHistoricoFallasCajero;
-                case "SolicitarTipoFalla":
-                    return Intensiones.SolicitarTipoFalla;
+                //case "SolicitarFallasCajerosEmpresa":
+                //    return Intensiones.SolicitarFallasCajerosEmpresa;
+                case "SolicitarHistoricoFallasCajerosEmpresa":
+                    return Intensiones.SolicitarHistoricoFallasCajerosEmpresa;
+                case "SolicitarHistoricoFallasCajeros":
+                    return Intensiones.SolicitarHistoricoFallasCajeros;
+                case "solicitarFechaSolucion":
+                    return Intensiones.solicitarFechaSolucion;                
                 case "Saludo":
                     return Intensiones.Saludo;
                 default:
@@ -121,15 +123,8 @@ namespace CajerosBTBot.implementaciones
         private EstadoDeAnimo ConvertirTextAnalyticsAEstadoDeAnimo(ResultadoTextAnalytics textAnalytics)
         {
 
-            //  decimal b;
-
+      
             Class1.score = float.Parse(textAnalytics.documents[0].score, CultureInfo.InvariantCulture.NumberFormat);
-            // if .TryParse is successful - you'll have the value in "kilometro"
-           // if (Decimal.TryParse(textAnalytics.documents[0].score.ToString(), out b)
-           // {
-                // if .TryParse fails - set the value for "kilometro" to 0.0
-              //  Class1.score = b;
-           // }
 
             //var score = Convert.ToDouble(textAnalytics.documents[0].score);
             if (Class1.score > 0.6)

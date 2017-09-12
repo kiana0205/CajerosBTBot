@@ -7,6 +7,10 @@ namespace CajerosBTBot.Bean
 {
     public class Tiempo
     {
-        public string tiempo { get; set; }
+        public string fechaestimada { get; set; }
+
+        public string cajero { get; set; }
+
+        public string responsable { get; set; }
     }
 }

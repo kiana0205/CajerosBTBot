@@ -72,13 +72,13 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
                       
                         StringBuilder sb = new StringBuilder();
-                        sb.Append("SELECT d.id_producto as cajero, d.fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo ");
+                        sb.Append("SELECT d.id_producto as cajero, d.fecha_inicio as fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo ");
                         sb.Append("FROM falla_f_fallas_diaria d");
                         sb.Append(" join falla_d_fallas f ");
                         sb.Append(" on f.id_falla = d.id_falla");
                         sb.Append(" where d.id_producto='" + cajero + "'");
                         sb.Append(" and d.id_tipo_producto = 2");
-                        sb.Append(" group by d.id_producto, d.fecha, f.tipo_falla, d.folio");
+                        sb.Append(" group by d.id_producto, d.fecha_inicio, f.tipo_falla, d.folio");
                         // sb.Append("JOIN [SalesLT].[Product] p ");
                         //sb.Append("ON pc.productcategoryid = p.productcategoryid;");
                         String sql = sb.ToString();
@@ -119,12 +119,112 @@ namespace CajerosBTBot.implementaciones
 
 
 
-        public List<Cajero> obtenerHistoricoCajeroEmpresa(string empresa)
+        public List<Empresa> obtenerHistoricoCajeroEmpresa(string empresa, string periodo)
+        {
+            List<Empresa> cajeros = new List<Empresa>();
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+
+                }
+
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
+        }
+
+
+        public List<Cajero> obtenerHistoricoCajero(string cajero, string periodo)
         {
             List<Cajero> cajeros = new List<Cajero>();
             try
             {
-            }
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+                    StringBuilder cn = new StringBuilder();
+
+                    switch (periodo)
+                    {
+                        case "TOP 5":
+                            cn.Append(" SELECT TOP 5a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha_inicio as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and f.id_producto ='"+cajero+"'");
+                            cn.Append(" order by fecha_inicio desc ");
+                            break;
+
+                        case "*":
+                            cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria2 f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and f.id_producto ='" + cajero + "'");
+                            cn.Append(" order by fecha desc ");
+                            break;
+                        default: {
+                                cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                                cn.Append(" from falla_f_fallas_diaria2 f");
+                                cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                                cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                                cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                                cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                                cn.Append(" where f.id_tipo_producto = 2");
+                                cn.Append(" and f.id_producto ='" + cajero + "'");
+                                cn.Append(" order by fecha desc ");
+                                break;
+                            }
+                    }
+                    String sql = cn.ToString();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Cajero cajeroBean = new Cajero();
+
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.fecha = myReader["fecha"].ToString();
+                            //cajeroBean.conteo = myReader["conteo"].ToString();                            
+                            cajeroBean.tipoFalla = myReader["tipofalla"].ToString();
+                            cajeroBean.folio = myReader["folio"].ToString();
+
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+
+
+                }
+
+             }
             catch (SqlException e)
             {
                 Console.WriteLine(e.ToString());
@@ -147,13 +247,23 @@ namespace CajerosBTBot.implementaciones
                 {
                     connection.Open();
 
+                    var emp = String.Empty;
+                    if (empresa.Length > 15)
+                    {
+                        emp = empresa.Substring(0, 15);
+                    }
+                    else {
+                        emp = empresa;
+                    }
+                    
+
                     StringBuilder cn = new StringBuilder();
                     cn.Append(" select count(*) from falla_f_fallas_diaria f ");
                     cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
                     cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
                     cn.Append(" where f.id_tipo_producto = 2");
-                    cn.Append(" and e.empresa like = '%" + empresa + "%'");
-                    cn.Append(" group by a.id_empresa ");
+                    cn.Append(" and e.empresa like  '%" +emp+ "%'");
+                    //cn.Append(" group by a.id_empresa ");
                     String res = cn.ToString();
                     SqlCommand comm = new SqlCommand(res, connection);
                     Int32 count = (Int32)comm.ExecuteScalar();
@@ -196,16 +306,26 @@ namespace CajerosBTBot.implementaciones
                     Console.WriteLine("=========================================\n");
 
                     connection.Open();
+                    //var emp = empresa.Substring(0, 15);
+                    var emp = String.Empty;
+                    if (empresa.Length > 15)
+                    {
+                        emp = empresa.Substring(0, 15);
+                    }
+                    else
+                    {
+                        emp = empresa;
+                    }
 
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("SELECT ai.id_cajero as cajero, e.empresa, s.tipo_falla as tipoFalla, a.id_empresa, f.folio ");
+                    sb.Append("SELECT a.id_cajero as cajero, e.empresa, s.tipo_falla as tipoFalla, a.id_empresa, f.folio ");
                     sb.Append("FROM falla_f_fallas_diaria f");
                     sb.Append(" left join falla_d_fallas s on s.id_falla=f.id_falla ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
-                    sb.Append(" left join cat_d_empresa_grupo e on e.id_falla = f.id_falla");
-                    sb.Append(" where e.empresa like ='%" + empresa + "%'");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa");
+                    sb.Append(" where e.empresa like '%" + emp + "%'");
                     sb.Append(" and f.id_tipo_producto = 2");
-                    sb.Append(" order by empresa asc, tipo_falla desc");
+                    //sb.Append(" order by empresa asc, tipo_falla desc");
                     // sb.Append("JOIN [SalesLT].[Product] p ");
                     //sb.Append("ON pc.productcategoryid = p.productcategoryid;");
                     String sql = sb.ToString();
@@ -244,6 +364,123 @@ namespace CajerosBTBot.implementaciones
             return cajeros;
         }
 
+
+        public List<Empresa> ObtenerEmpresas(string empresa)
+        {
+            List<Empresa> empresas = new List<Empresa>();
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+
+                    connection.Open();
+
+                    var emp = String.Empty;
+                    if (empresa.Length > 15)
+                    {
+                        emp = empresa.Substring(0, 15);
+                    }
+                    else
+                    {
+                        emp = empresa;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  e.id_empresa, e.empresa from falla_f_fallas_diaria f ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto  ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");                 
+                    sb.Append(" where f.id_tipo_producto = 2  and e.empresa like '%" + emp + "%'");
+                    sb.Append(" group by e.id_empresa, e.empresa");
+                    sb.Append(" order by e.empresa desc");
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Empresa cajeroBean = new Empresa();                          
+                            cajeroBean.empresa = myReader["empresa"].ToString();
+                            cajeroBean.id_empresa = myReader["id_empresa"].ToString();                             
+                            empresas.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+
+            return empresas;
+        }
+
+        public List<Tiempo> obtenerPeriodoSolucion(string cajero)
+        {
+            List<Tiempo> tiempo = new List<Tiempo>();
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  id_producto as cajero, fecha_estimada_solucion as fechaestimada, ");
+                    sb.Append(" responsable from falla_f_fallas_diaria    ");                    
+                    sb.Append(" where id_tipo_producto = 2  and id_producto='" + cajero +"'");                                        
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Tiempo cajeroBean = new Tiempo();
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.fechaestimada = myReader["fechaestimada"].ToString();
+                            cajeroBean.responsable = myReader["responsable"].ToString();
+                            tiempo.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+                }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return tiempo;
+        }
+        
 
 
         /*   public List<Cajero> obtenerFallaCajerosEmpresa(string empresa)
