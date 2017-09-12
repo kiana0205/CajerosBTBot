@@ -259,3 +259,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/CajerosBTBot/Dialogs/CancelScorable.cs
+/CajerosBTBot/Properties/PublishProfiles/CajerosBTBot - FTP.pubxml
+/CajerosBTBot/Properties/PublishProfiles/CajerosBTBot - Web Deploy.pubxml
+/CajerosBTBot/DatabaseConexionModule.cs
+/CajerosBTBot/GlobalMessageHandlersBotModule.cs
