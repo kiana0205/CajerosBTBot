@@ -117,8 +117,9 @@ namespace CajerosBTBot.Dialogs
                     //await SolicitarHistoricoCajero(context, tiempo, cajero);
                     break;
                 case Intensiones.solicitarFechaSolucion:
-                    Program.cajero = objetoLuis.Entidades[0].entity;
-                    await SolicitarFechaSolucion(context, Program.cajero);
+                    tiempo= objetoLuis.Entidades[0].entity;
+                    //Program.cajero = objetoLuis.Entidades[0].entity;
+                    await SolicitarFechaSolucion(context, Program.cajero, tiempo);
                     break;
                 default:
                     await context.PostAsync(intension.ToString());
@@ -602,7 +603,7 @@ namespace CajerosBTBot.Dialogs
             context.Wait(MessageReceivedAsync);
         }
 
-        private async Task SolicitarFechaSolucion(IDialogContext context, string cajero) {
+        private async Task SolicitarFechaSolucion(IDialogContext context, string cajero, string fecha) {
             IConsultorDB bd = new CajeroDaoImpl();
             var tiempo = bd.obtenerPeriodoSolucion(cajero);
 
@@ -618,13 +619,27 @@ namespace CajerosBTBot.Dialogs
                     
                 }
                 else {
-                    estimada = cajeroBean.fechaestimada;
+
+                    switch (fecha)
+                    {
+                        case "hora":
+                            string sean = cajeroBean.fechaestimada;
+                            estimada = sean.Substring(sean.Length-8);
+                            break;
+                        case "fecha":
+                            estimada = "cajeroBean.fechaestimada";
+                            break;             
+                        default:
+                            estimada = "cajeroBean.fechaestimada";
+                            break;
+                    }
+                    //estimada = cajeroBean.fechaestimada;
                 }
 
                 var menuHeroCard = new HeroCard
                 {
                     //Subtitle = cajeroBean.conteo + " falla(s)",
-                    Title = "El cajero " + cajero.ToUpper() + " tiene fecha posible de solucion: "+estimada,
+                    Title = "El cajero " + cajero.ToUpper() + " tiene "+fecha+" posible de solucion: "+estimada,
                     Text = " Responsable :"+cajeroBean.responsable,                    
                     Images = new List<CardImage> {                       
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/solucion.jpg" }
