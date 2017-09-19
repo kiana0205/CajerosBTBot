@@ -9,6 +9,7 @@ using CajerosBTBot.Bean;
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace CajerosBTBot.Dialogs
 {
     [Serializable]
@@ -16,6 +17,9 @@ namespace CajerosBTBot.Dialogs
     {
         List<string> lista;
 
+        public static class Program {
+            public static string cajero;
+        }
         //Hola Diana :)
         public Task StartAsync(IDialogContext context)
         {
@@ -61,6 +65,14 @@ namespace CajerosBTBot.Dialogs
             var empresa = String.Empty;
             var cajero = String.Empty;
             var tiempo = String.Empty;
+
+           /* if (objetoLuis.Entidades[0].type.Equals("cajero") && objetoLuis.TopScoringIntent.intent.Equals("SolicitarEstatusCajero"))
+            {
+                Program.cajero = objetoLuis.Entidades[0].entity;
+            }*/
+
+
+
             switch (intension)
             {
                 case Intensiones.Saludo:
@@ -72,8 +84,8 @@ namespace CajerosBTBot.Dialogs
                     context.Wait(MessageReceivedAsync);
                     break;
                 case Intensiones.SolicitarEstatusCajero:
-                    cajero = objetoLuis.Entidades[0].entity;
-                    await SolicitarEstatusCajero(context, cajero);
+                    Program.cajero = objetoLuis.Entidades[0].entity;
+                    await SolicitarEstatusCajero(context, Program.cajero);
                     break;
                 case Intensiones.SolicitarEstatusCajerosEmpresa:
                     empresa = objetoLuis.Entidades[0].entity;
@@ -97,16 +109,16 @@ namespace CajerosBTBot.Dialogs
                     }
                     else
                     {
-                        cajero = objetoLuis.Entidades[1].entity;
-                        await SolicitarHistoricoCajero(context, tiempo, cajero);
+                        Program.cajero = objetoLuis.Entidades[1].entity;
+                        await SolicitarHistoricoCajero(context, tiempo, Program.cajero);
 
                     }
                     //cajero = objetoLuis.Entidades[1].entity;
                     //await SolicitarHistoricoCajero(context, tiempo, cajero);
                     break;
                 case Intensiones.solicitarFechaSolucion:
-                    cajero = objetoLuis.Entidades[0].entity;
-                    await SolicitarFechaSolucion(context, cajero);
+                    Program.cajero = objetoLuis.Entidades[0].entity;
+                    await SolicitarFechaSolucion(context, Program.cajero);
                     break;
                 default:
                     await context.PostAsync(intension.ToString());
@@ -269,32 +281,58 @@ namespace CajerosBTBot.Dialogs
         {
             IConsultorDB bd = new CajeroDaoImpl();
             var obtienemepresa = bd.ObtenerEmpresas(empresa);
-            string[] valores1;
+            //string[] valores1;
             string cadena = String.Empty;
             StringBuilder sb = new StringBuilder();
             if (obtienemepresa.Count > 1)
             {
-                valores1 = new string[obtienemepresa.Count];
+                List<Empresa> choices = new List<Empresa>();
+                // valores1 = new string[obtienemepresa.Count];
                 for (int i = 0; i < obtienemepresa.Count; i++)
                 {
-                    valores1[i] = obtienemepresa[i].empresa;
-                }
+                //  valores1[i] = obtienemepresa[i].empresa;
+                    choices.Add(new Empresa(obtienemepresa[i].empresa, obtienemepresa[i].id_empresa));
+                 }
 
 
-                List<string> lista = new List<string>();
-                for (int i = 0; i < obtienemepresa.Count; i++)
-                {
-                    lista.Add(valores1[i]);
+                //List<string> lista = new List<string>();
+                //for (int i = 0; i < obtienemepresa.Count; i++)
+                //{
+                //lista.Add(valores1[i]);
+                //}
 
-                }
-
+                var result = ShowOptions(choices);
                 var activity = context.MakeMessage();
-                activity.Text = "Se encontro mas de una empresa. Desea ver las opciones. Escriba 1 para si  o 0 para un No ";
-
+                activity.Text = "Se encontro mas de una empresa con ese nombre ";
+                activity.Attachments.Add(result);
                 await context.PostAsync(activity);
+                //context.Wait(ConnectOption);
 
+                //activity.Attachments = new List<Attachment>();              
+                /*List<CardAction> messageOptions = new List<CardAction>();
+          
 
-                //PromptDialog.Choice(context, this.OnOptionSelected, lista, "Encontramos mas de una empresa. a cual se refiere?");
+                for (int i =0; i< obtienemepresa.Count; i++ ) {
+                    messageOptions.Add(new CardAction
+                    {
+                        Title= obtienemepresa[i].empresa,
+                        Text= obtienemepresa[i].id_empresa
+                    });
+                }
+
+                activity.Attachments.Add(
+                new HeroCard
+                {
+                    Title = "¿A cual empresa te refieres?",
+                    Buttons = messageOptions
+                }.ToAttachment()
+                    );*/
+
+                //foreach (Empresa choice in choices) {
+                //}
+                //activity.Attachments.Add(messageOptions);
+               
+                //await context.PostAsync(activity);
 
             }
             else
@@ -624,51 +662,36 @@ namespace CajerosBTBot.Dialogs
 
         }
 
-        private void ShowOptions(IDialogContext context)
+        private Attachment ShowOptions(List<Empresa> choices)
         {
-            PromptDialog.Choice(context, this.OnOptionSelected, new List<string>() { "FlightsOption", "HotelsOption" }, "Are you looking for a flight or a hotel?");
-        }
 
-        private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
-        {
-            try
+            List<CardAction> messageOptions = new List<CardAction>();
+
+            for (int i = 0; i < choices.Count; i++)
             {
-                string optionSelected = await result;
-
-                switch (optionSelected)
+                messageOptions.Add(new CardAction
                 {
-                    case "A":
-                        context.Call(new RootDialog(), this.ResumeAfterOptionDialog);
-                        break;
-
-                    case "B":
-                        context.Call(new RootDialog(), this.ResumeAfterOptionDialog);
-                        break;
-                    default: { context.Wait(MessageReceivedAsync); break; }
-                }
+                    Title = choices[i].Empresas,
+                    Text = choices[i].Mensaje
+                });
             }
-            catch (TooManyAttemptsException ex)
+
+            //activity.Attachments.Add(
+            var card = new HeroCard
             {
-                await context.PostAsync($"Ooops! Too many attemps :(. But don't worry, I'm handling that exception and you can try again!");
+                Title = "¿Escribe a cual empresa te refieres?",
+                Buttons = messageOptions
+            };
+             
+             //.ToAttachment()
+             //   );
+            return card.ToAttachment();
+        }
+        private async Task ConnectOption(IDialogContext context, IAwaitable<Object> result) {
+            var temp = await result;
 
-                context.Wait(MessageReceivedAsync);
-            }
+            context.Done(new Object());
         }
 
-        private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<object> result)
-        {
-            try
-            {
-                var message = await result;
-            }
-            catch (Exception ex)
-            {
-                await context.PostAsync($"Failed with message: {ex.Message}");
-            }
-            finally
-            {
-                context.Wait(this.MessageReceivedAsync);
-            }
-        }
     }
 }

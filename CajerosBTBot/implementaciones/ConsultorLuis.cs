@@ -17,7 +17,12 @@ namespace CajerosBTBot.implementaciones
 {
     public class ConsultorLuis : IConsultorCognitive
     {
-       
+
+        public static class Program
+        {
+            public static string cajero;
+        }
+
         private const string UrlServicioLuis = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ea11a124-10ea-4977-bb9a-b76bdc58ddb2?subscription-key=22cbe58ef25b47e3a08e4f472d774359&timezoneOffset=0&verbose=false&q=";
         public async Task<ObjetoLuis> ConsultarLuis(string textoEvaluar)
         {
@@ -39,6 +44,21 @@ namespace CajerosBTBot.implementaciones
 
                 var javaScriptSerializer = new JavaScriptSerializer();
                 var resultadoAnalisisTexto = javaScriptSerializer.Deserialize<ResultadoLuis>(contenidoRespuesta);
+
+            
+
+
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("solicitarFechaSolucion")) {                                
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.cajero;
+                    ent.score = 0.9;
+                    ent.type = "cajero";
+                    resultadoAnalisisTexto.entities.Add(ent);             
+                }
+
+               /* if (resultadoAnalisisTexto.entities[0].type.Equals("cajero")) {
+                    Program.cajero = resultadoAnalisisTexto.entities[0].entity;
+                }    */    
                 return new ObjetoLuis()
                 {
                     Entidades = resultadoAnalisisTexto.entities.ToList(),
@@ -56,6 +76,7 @@ namespace CajerosBTBot.implementaciones
                 case "None":
                     return Intensiones.None;
                 case "SolicitarEstatusCajero":
+                    Program.cajero = objetosLuis.Entidades[0].entity;
                     return Intensiones.SolicitarEstatusCajero;
                 case "SolicitarEstatusCajerosEmpresa":
                     return Intensiones.SolicitarEstatusCajerosEmpresa;
