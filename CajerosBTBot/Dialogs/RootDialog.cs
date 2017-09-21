@@ -36,13 +36,14 @@ namespace CajerosBTBot.Dialogs
             activity.Text = "Bienvenido ";
             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 
-            var menuHeroCard = new HeroCard
+            //var menuHeroCard = new HeroCard
+            var menuHeroCard = new ThumbnailCard
             {
-                Text = "Disponibilidad",
-                Title = "Cajeros Banca Transaccional",
-                //Subtitle = "Opción",
+                //Text = "Disponibilidad",
+                Title = "Banca Transaccional",
+                Subtitle = "Cajeros Disponibilidad",
                 Images = new List<CardImage> {
-                    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/Banorte.png" }
+                    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
                 }
             }.ToAttachment();
 
@@ -120,6 +121,10 @@ namespace CajerosBTBot.Dialogs
                     tiempo= objetoLuis.Entidades[0].entity;
                     //Program.cajero = objetoLuis.Entidades[0].entity;
                     await SolicitarFechaSolucion(context, Program.cajero, tiempo);
+                    break;
+                case Intensiones.SolicitarResponsableCajero:
+                    Program.cajero = objetoLuis.Entidades[0].entity;                    
+                    await SolicitarResponsable(context, Program.cajero);
                     break;
                 default:
                     await context.PostAsync(intension.ToString());
@@ -200,11 +205,11 @@ namespace CajerosBTBot.Dialogs
                     Cajero cajeroBean = cajeros[0];
                     var activity = context.MakeMessage();
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    var menuHeroCard = new HeroCard
+                    var menuHeroCard = new ThumbnailCard
                     {
                         //Subtitle = cajeroBean.conteo + " falla(s)",
                         Title = "El cajero " + cajero.ToUpper() + " tiene: ",
-                        Text = cajeroBean.conteo + " falla(s)",
+                        Subtitle = cajeroBean.conteo + " falla(s)",
                         Images = new List<CardImage> {
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
                     }
@@ -247,9 +252,9 @@ namespace CajerosBTBot.Dialogs
                 {
                     var activity = context.MakeMessage();
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    var menuHeroCard = new HeroCard
+                    var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Algo más en que le podamos ayudar",
+                        Text = "Algo más en que le podamos ayudar?",
                         Subtitle = "Verifique el número de cajero",
                         Title = "No se identifico el cajero como parte de banca transaccional",
                         Images = new List<CardImage> {
@@ -349,7 +354,7 @@ namespace CajerosBTBot.Dialogs
 
                         var activity = context.MakeMessage();
                         activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                        var menuHeroCard = new HeroCard
+                        var menuHeroCard = new ThumbnailCard
                         {
                             //Subtitle = cajeroBean.conteo + " falla(s)",
                             Title = "La empresa " + empresa.ToUpper() + " tiene las siguientes fallas: ",
@@ -414,7 +419,7 @@ namespace CajerosBTBot.Dialogs
                     {
                         var activity = context.MakeMessage();
                         activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                        var menuHeroCard = new HeroCard
+                        var menuHeroCard = new ThumbnailCard
                         {
                             Text = "Algo más en que le podamos ayudar",
                             Subtitle = "Verifique el número de cajero",
@@ -477,7 +482,7 @@ namespace CajerosBTBot.Dialogs
 
                 var activity = context.MakeMessage();
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                var menuHeroCard = new HeroCard
+                var menuHeroCard = new ThumbnailCard
                 {
                     //Subtitle = cajeroBean.conteo + " falla(s)",
                     Title = "El cajero " + cajero.ToUpper() + " tiene ha tenido las siguientes fallas: ",
@@ -544,9 +549,9 @@ namespace CajerosBTBot.Dialogs
             {
                 var activity = context.MakeMessage();
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                var menuHeroCard = new HeroCard
+                var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Algo más en que le podamos ayudar",
+                    Text = "Algo más en que le podamos ayudar?",
                     //Subtitle = "Verifique e",
                     Title = "No es posible identificar ese cajero",
                     Images = new List<CardImage> {
@@ -582,9 +587,9 @@ namespace CajerosBTBot.Dialogs
             {
                 var activity = context.MakeMessage();
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                var menuHeroCard = new HeroCard
+                var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Algo más en que le podamos ayudar",
+                    Text = "Algo más en que le podamos ayudar?",
                     //Subtitle = "Verifique e",
                     Title = "No es posible identificar ese cajero",
                     Images = new List<CardImage> {
@@ -627,20 +632,20 @@ namespace CajerosBTBot.Dialogs
                             estimada = sean.Substring(sean.Length-8);
                             break;
                         case "fecha":
-                            estimada = "cajeroBean.fechaestimada";
+                            estimada = cajeroBean.fechaestimada;
                             break;             
                         default:
-                            estimada = "cajeroBean.fechaestimada";
+                            estimada = cajeroBean.fechaestimada;
                             break;
                     }
                     //estimada = cajeroBean.fechaestimada;
                 }
 
-                var menuHeroCard = new HeroCard
+                var menuHeroCard = new ThumbnailCard
                 {
                     //Subtitle = cajeroBean.conteo + " falla(s)",
                     Title = "El cajero " + cajero.ToUpper() + " tiene "+fecha+" posible de solucion: "+estimada,
-                    Text = " Responsable :"+cajeroBean.responsable,                    
+                    Subtitle = " Responsable :"+cajeroBean.responsable,                    
                     Images = new List<CardImage> {                       
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/solucion.jpg" }
                     }
@@ -657,9 +662,9 @@ namespace CajerosBTBot.Dialogs
             {
                 var activity = context.MakeMessage();
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                var menuHeroCard = new HeroCard
+                var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Algo más en que le podamos ayudar",
+                    Text = "Algo más en que le podamos ayudar?",
                     //Subtitle = "Verifique e",
                     Title = "No es posible identificar ese cajero",
                     Images = new List<CardImage> {                        
@@ -677,7 +682,69 @@ namespace CajerosBTBot.Dialogs
 
         }
 
-        private Attachment ShowOptions(List<Empresa> choices)
+        private async Task SolicitarResponsable(IDialogContext context, string cajero)
+        {
+            IConsultorDB bd = new CajeroDaoImpl();
+            var responsable = bd.obtenerResponsable(cajero.ToUpper());
+            if (responsable != null && responsable.Count > 0)
+            {
+                Cajero cajeroBean = responsable[0];
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                string resp = string.Empty;
+                if (cajeroBean.responsable.Equals(""))
+                {
+                    resp = "No hay datos del responsable";
+
+                }
+                else
+                {
+                    resp = cajeroBean.responsable;
+                }
+
+                var menuHeroCard = new ThumbnailCard
+                {
+                    //Subtitle = cajeroBean.conteo + " falla(s)",
+                    Title = "El responsable del cajero " + cajero.ToUpper() + " es: ",
+                    Subtitle = resp,
+                    Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/solucion.jpg" }
+                    }
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
+                await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+
+
+            }
+            else {
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                    //Subtitle = "Verifique e",
+                    Title = "No es posible identificar ese cajero",
+                    Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
+                    }
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
+            }
+
+        }
+
+
+
+            private Attachment ShowOptions(List<Empresa> choices)
         {
 
             List<CardAction> messageOptions = new List<CardAction>();

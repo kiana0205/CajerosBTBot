@@ -480,7 +480,57 @@ namespace CajerosBTBot.implementaciones
             }
             return tiempo;
         }
-        
+
+        public List<Cajero> obtenerResponsable(string cajero) {
+            List<Cajero> cajeros = new List<Cajero>();
+            try
+            {
+
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "serviciobt.database.windows.net";
+                builder.UserID = "adminservbt";
+                builder.Password = "serv.bt0916";
+                builder.InitialCatalog = "serviciobanorte-btdb";
+
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  id_producto as cajero,  ");
+                    sb.Append(" responsable from falla_f_fallas_diaria    ");
+                    sb.Append(" where id_tipo_producto = 2  and id_producto='" + cajero + "'");
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Cajero cajeroBean = new Cajero();
+                            cajeroBean.cajero = myReader["cajero"].ToString();                           
+                            cajeroBean.responsable = myReader["responsable"].ToString();
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
+        }
+
 
 
         /*   public List<Cajero> obtenerFallaCajerosEmpresa(string empresa)

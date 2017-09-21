@@ -87,7 +87,9 @@ namespace CajerosBTBot.implementaciones
                 case "SolicitarHistoricoFallasCajeros":
                     return Intensiones.SolicitarHistoricoFallasCajeros;
                 case "solicitarFechaSolucion":
-                    return Intensiones.solicitarFechaSolucion;                
+                    return Intensiones.solicitarFechaSolucion;
+                case "SolicitarResponsableCajero":
+                    return Intensiones.SolicitarResponsableCajero;
                 case "Saludo":
                     return Intensiones.Saludo;
                 default:

@@ -14,7 +14,9 @@ namespace CajerosBTBot.Bean
 
         public string conteo { get; set; }
 
-        public String folio { get; set; }
+        public string folio { get; set; }
+
+        public string responsable { get; set; }
 
     }
 }
