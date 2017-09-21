@@ -248,13 +248,13 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
 
                     var emp = String.Empty;
-                    if (empresa.Length > 15)
+                   /* if (empresa.Length > 15)
                     {
                         emp = empresa.Substring(0, 15);
                     }
                     else {
                         emp = empresa;
-                    }
+                    }*/
                     
 
                     StringBuilder cn = new StringBuilder();
@@ -262,7 +262,7 @@ namespace CajerosBTBot.implementaciones
                     cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
                     cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
                     cn.Append(" where f.id_tipo_producto = 2");
-                    cn.Append(" and e.empresa like  '%" +emp+ "%'");
+                    cn.Append(" and e.empresa like  '" +empresa+ "%'");
                     //cn.Append(" group by a.id_empresa ");
                     String res = cn.ToString();
                     SqlCommand comm = new SqlCommand(res, connection);
@@ -384,20 +384,20 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
 
                     var emp = String.Empty;
-                    if (empresa.Length > 35)
+                   /* if (empresa.Length > 35)
                     {
                         emp = empresa.Substring(0, 35);
                     }
                     else
                     {
                         emp = empresa;
-                    }
+                    }*/
 
                     StringBuilder sb = new StringBuilder();
                     sb.Append(" select  e.id_empresa, e.empresa from falla_f_fallas_diaria f ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto  ");
                     sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");                 
-                    sb.Append(" where f.id_tipo_producto = 2  and e.empresa like '" + emp + "%'");
+                    sb.Append(" where f.id_tipo_producto = 2  and e.empresa like '" + empresa + "%'");
                     sb.Append(" group by e.id_empresa, e.empresa");
                     sb.Append(" order by e.empresa desc");
 

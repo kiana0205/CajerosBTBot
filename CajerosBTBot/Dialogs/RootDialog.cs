@@ -119,6 +119,9 @@ namespace CajerosBTBot.Dialogs
                     break;
                 case Intensiones.solicitarFechaSolucion:
                     tiempo= objetoLuis.Entidades[0].entity;
+                    if (objetoLuis.Entidades.Count > 1) {
+                        Program.cajero = objetoLuis.Entidades[1].entity;
+                    }
                     //Program.cajero = objetoLuis.Entidades[0].entity;
                     await SolicitarFechaSolucion(context, Program.cajero, tiempo);
                     break;
@@ -256,7 +259,7 @@ namespace CajerosBTBot.Dialogs
                     {
                         Text = "Algo más en que le podamos ayudar?",
                         Subtitle = "Verifique el número de cajero",
-                        Title = "No se identifico el cajero como parte de banca transaccional",
+                        Title = "No existen fallas en el cajero " + cajero.ToUpper() + "o no pertenece a banca transaccional",
                         Images = new List<CardImage> {
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
                     }
@@ -273,11 +276,24 @@ namespace CajerosBTBot.Dialogs
 
                 var activity = context.MakeMessage();
 
-                activity.Text = "No se encontraron fallas en el cajero " + cajero.ToUpper();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                    Subtitle = "Verifique el número de cajero",
+                    Title = "No existen fallas en el cajero "+ cajero.ToUpper()+" o no pertenece a banca transaccional",
+                    Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
+                    }
+                }.ToAttachment();
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+
+                //activity.Text = "No se encontraron fallas en el cajero " + cajero.ToUpper();
 
                 await context.PostAsync(activity);
 
-                await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
             }
             context.Wait(MessageReceivedAsync);
         }
@@ -307,9 +323,9 @@ namespace CajerosBTBot.Dialogs
                 //lista.Add(valores1[i]);
                 //}
 
-                var result = ShowOptions(choices);
+                var result = ShowOptions(choices, empresa);
                 var activity = context.MakeMessage();
-                activity.Text = "Se encontro mas de una empresa con ese nombre ";
+                activity.Text = "Se encontro mas de una empresa. Escriba cual desea consultar ";
                 activity.Attachments.Add(result);
                 await context.PostAsync(activity);
                 //context.Wait(ConnectOption);
@@ -744,25 +760,32 @@ namespace CajerosBTBot.Dialogs
 
 
 
-            private Attachment ShowOptions(List<Empresa> choices)
+            private Attachment ShowOptions(List<Empresa> choices, string empresa)
         {
+            int tam = empresa.Length;
 
             List<CardAction> messageOptions = new List<CardAction>();
 
             for (int i = 0; i < choices.Count; i++)
             {
+                int tam2=choices[i].Empresas.Length;
+                int tam3 = tam2 - tam;
+                string emp=choices[i].Empresas.Substring(tam, tam3);
                 messageOptions.Add(new CardAction
                 {
-                    Title = choices[i].Empresas,
-                    Text = choices[i].Mensaje
+                    Title = emp,
+                    //Title = choices[i].Empresas,
+                    //Text = choices[i].Mensaje
                 });
             }
 
             //activity.Attachments.Add(
             var card = new HeroCard
             {
-                Title = "¿Escribe a cual empresa te refieres?",
+                Title = "Escribe el nombre empezando por ",
+                Subtitle= empresa.ToUpper()+" ...",
                 Buttons = messageOptions
+                //Text = messageOptions
             };
              
              //.ToAttachment()
