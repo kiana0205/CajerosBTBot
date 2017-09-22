@@ -133,6 +133,69 @@ namespace CajerosBTBot.implementaciones
                 using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
+                    StringBuilder cn = new StringBuilder();
+                    switch (periodo)
+                    {
+                        case "TOP 5":
+                            cn.Append(" SELECT TOP 5a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha_inicio as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and e.empresa like'%" + empresa + "%'");
+                            cn.Append(" order by fecha_inicio desc ");
+                            break;
+
+                        case "MONTH":
+                            cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and e.empresa like'%" + empresa + "%'");
+                            cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
+                            cn.Append(" order by fecha desc ");
+                            break;
+                        default:
+                            {
+                                cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                                cn.Append(" from falla_f_fallas_diaria f");
+                                cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                                cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                                cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                                cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                                cn.Append(" where f.id_tipo_producto = 2");
+                                cn.Append(" and e.empresa like'%" + empresa + "%'");
+                                cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
+                                cn.Append(" order by fecha desc ");
+                                break;
+                            }
+                    }
+                    String sql = cn.ToString();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Empresa cajeroBean = new Empresa();
+
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.fecha = myReader["fecha"].ToString();
+                            cajeroBean.empresa = myReader["empresa"].ToString();
+                            //cajeroBean.conteo = myReader["conteo"].ToString();                            
+                            cajeroBean.tipoFalla = myReader["tipofalla"].ToString();
+                            cajeroBean.folio = myReader["folio"].ToString();
+
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
 
                 }
 
@@ -175,26 +238,28 @@ namespace CajerosBTBot.implementaciones
                             cn.Append(" order by fecha_inicio desc ");
                             break;
 
-                        case "*":
+                        case "MONTH":
                             cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
-                            cn.Append(" from falla_f_fallas_diaria2 f");
+                            cn.Append(" from falla_f_fallas_diaria f");
                             cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
                             cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
                             cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
                             cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
                             cn.Append(" where f.id_tipo_producto = 2");
                             cn.Append(" and f.id_producto ='" + cajero + "'");
+                            cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
                             cn.Append(" order by fecha desc ");
                             break;
                         default: {
                                 cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
-                                cn.Append(" from falla_f_fallas_diaria2 f");
+                                cn.Append(" from falla_f_fallas_diaria f");
                                 cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
                                 cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
                                 cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
                                 cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
                                 cn.Append(" where f.id_tipo_producto = 2");
                                 cn.Append(" and f.id_producto ='" + cajero + "'");
+                                cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
                                 cn.Append(" order by fecha desc ");
                                 break;
                             }

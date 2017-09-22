@@ -100,13 +100,9 @@ namespace CajerosBTBot.Dialogs
                 case Intensiones.SolicitarHistoricoFallasCajeros:
                     tiempo = objetoLuis.Entidades[0].entity;
                     if (objetoLuis.Entidades[0].type.Equals("cajero")) {
-                       // var activity = context.MakeMessage();
-
-                       // activity.Text = "No entiendo la solicitud. Vuelva a intentar ";
-
-                       // await context.PostAsync(activity);
-
-                       // await context.PostAsync("En que le podamos ayudar?");
+                        Program.cajero = objetoLuis.Entidades[0].entity;
+                        tiempo = "historico";
+                        await SolicitarHistoricoCajero(context, tiempo, Program.cajero);  
                     }
                     else
                     {
@@ -114,8 +110,6 @@ namespace CajerosBTBot.Dialogs
                         await SolicitarHistoricoCajero(context, tiempo, Program.cajero);
 
                     }
-                    //cajero = objetoLuis.Entidades[1].entity;
-                    //await SolicitarHistoricoCajero(context, tiempo, cajero);
                     break;
                 case Intensiones.solicitarFechaSolucion:
                     tiempo= objetoLuis.Entidades[0].entity;
@@ -476,7 +470,7 @@ namespace CajerosBTBot.Dialogs
             }
             else if (tiempo.Contains("historico"))
             {
-                periodo = "*";
+                periodo = "MONTH";
             }
             else if (tiempo.Contains("mes"))
             {
@@ -596,6 +590,72 @@ namespace CajerosBTBot.Dialogs
             var historico = bd.obtenerHistoricoCajeroEmpresa(empresa.ToUpper(), periodo);
             if (historico != null && historico.Count > 0)
             {
+                //Cajero cajeroBean = historico[0];
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    //Subtitle = cajeroBean.conteo + " falla(s)",
+                    Title = "La empresa " + empresa.ToUpper() + " tiene ha tenido las siguientes fallas: ",
+                    Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
+                    }
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+
+
+                await context.PostAsync(activity);
+
+                for (int i = 0; i < historico.Count; i++)
+                {
+                    Empresa cajeroBean = historico[i];
+
+                    var tipofalla = String.Empty;
+                    var folio = String.Empty;
+                    switch (cajeroBean.tipoFalla)
+                    {
+                        case "ComunicacionEnergia":
+                            tipofalla = "Cajero sin energía";
+                            break;
+                        case "ErrorSinEfectivo":
+                            tipofalla = "Cajero sin efectivo";
+                            break;
+                        case "ModoSupervisor":
+                            tipofalla = "Modo Supervisor";
+                            break;
+                        case "FallaHardware":
+                            tipofalla = "Falla en el hardware";
+                            break;
+                        case "ProblemaLocal":
+                            tipofalla = "Cajero con problema local";
+                            break;
+                        case "TrxsNoMonetarias":
+                            tipofalla = "transacciones no monetarias";
+                            break;
+                        default:
+                            tipofalla = "Sin identificar";
+                            break;
+                    }
+
+                    if (cajeroBean.folio == "")
+                    {
+                        folio = "Sin folio";
+                    }
+                    else
+                    {
+                        folio = cajeroBean.folio;
+                    }
+
+                    await context.PostAsync("Falla: " + tipofalla + ",  Folio: " + folio + ", Fecha: " + cajeroBean.fecha);
+
+                }
+
+
+
+                await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
 
 
             }
