@@ -449,7 +449,7 @@ namespace CajerosBTBot.Dialogs
 
                     var activity = context.MakeMessage();
 
-                    activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
+                    activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper() +" o la empresa como tal la solicitaste no se encuentra";
 
                     await context.PostAsync(activity);
 
