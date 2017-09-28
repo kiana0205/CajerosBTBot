@@ -53,6 +53,25 @@ namespace CajerosBTBot.Dialogs
             await context.PostAsync(activity);
         }
 
+
+        private async void MostrarAyuda(IDialogContext context)
+        {
+            var activity = context.MakeMessage();
+            activity.Text = "Bienvenido al asistente de ayuda";
+            List<string> choices = new List<string>();
+            choices.Add("Estatus de algun cajero");
+            choices.Add("Estatus de los cajeros de una empresa");
+            choices.Add("Fecha probable de solucion de un cajero");
+            choices.Add("Hora probable de solucion de un cajero");
+            choices.Add("Responsable de algun cajero");
+            choices.Add("Fallas en el mes de un cajero");
+            choices.Add("Fallas en el mes de cajero por empresa");
+
+            var result = ShowOptions2(choices);           
+            activity.Attachments.Add(result);
+            await context.PostAsync(activity);
+
+        }
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<object> result)
         {
             var mensaje = await result as Activity;
@@ -80,17 +99,64 @@ namespace CajerosBTBot.Dialogs
                     await ManejarSaludo(context);
                     //context.Wait(MessageReceivedAsync);
                     break;
+                case Intensiones.Ayuda:
+                    await ManejarAyuda(context);
+                    break;
                 case Intensiones.None:
                     await context.PostAsync("No entendí la solicitud");
                     context.Wait(MessageReceivedAsync);
                     break;
                 case Intensiones.SolicitarEstatusCajero:
-                    Program.cajero = objetoLuis.Entidades[0].entity;
-                    await SolicitarEstatusCajero(context, Program.cajero);
+                    if (objetoLuis.Entidades[0].entity.Equals("desconocido"))
+                    {
+                        //await context.PostAsync("No entendí la solicitud. Utiliza la palabra cajero o empresa dentro de la solicitud");
+                        var activity = context.MakeMessage();
+                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Subtitle = "Debes especificar un cajero o nombre de la empresa",
+                            Title = "No entendi la solicitud ",
+                            Text="Utiliza la palabra cajero o empresa dentro de la solicitud",                            
+                            Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
+                        }   
+                        }.ToAttachment();
+
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                    }
+                    else
+                    {
+                        Program.cajero = objetoLuis.Entidades[0].entity;
+                        await SolicitarEstatusCajero(context, Program.cajero);
+                    }
                     break;
                 case Intensiones.SolicitarEstatusCajerosEmpresa:
-                    empresa = objetoLuis.Entidades[0].entity;
-                    await SolicitarEstatusCajerosEmpresa(context, empresa);
+                    if (objetoLuis.Entidades[0].entity.Equals("desconocido"))
+                    {
+                        //await context.PostAsync("No entendí la solicitud. Utiliza la palabra cajero o empresa dentro de la solicitud");                       
+                        var activity = context.MakeMessage();
+                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Subtitle = "Debes especificar un cajero o nombre de la empresa",
+                            Title = "No entendi la solicitud ",
+                            Text = "Utiliza la palabra cajero o empresa dentro de la solicitud",
+                            Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
+                        }
+                        }.ToAttachment();
+
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                    }
+                    else
+                    {
+                        empresa = objetoLuis.Entidades[0].entity;
+                        await SolicitarEstatusCajerosEmpresa(context, empresa);
+                    }
                     break;
                 case Intensiones.SolicitarHistoricoFallasCajerosEmpresa:
                     tiempo = objetoLuis.Entidades[0].entity;
@@ -137,6 +203,14 @@ namespace CajerosBTBot.Dialogs
 
             PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
+
+        private async Task ManejarAyuda(IDialogContext context)
+        {
+            await context.PostAsync("Has solicitado Ayuda ");
+            MostrarAyuda(context); 
+            //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
+        }
+
 
         private async Task RecibirEstadoUsuario(IDialogContext context, IAwaitable<string> estadoUsuarioAwaitable)
         {
@@ -686,6 +760,7 @@ namespace CajerosBTBot.Dialogs
 
         private async Task SolicitarFechaSolucion(IDialogContext context, string cajero, string fecha) {
             IConsultorDB bd = new CajeroDaoImpl();
+            string texto = string.Empty;
             var tiempo = bd.obtenerPeriodoSolucion(cajero);
 
             if (tiempo != null && tiempo.Count > 0)
@@ -700,17 +775,20 @@ namespace CajerosBTBot.Dialogs
                     
                 }
                 else {
-
+                                       
                     switch (fecha)
                     {
                         case "hora":
+                            texto = "hora";
                             string sean = cajeroBean.fechaestimada;
                             estimada = sean.Substring(sean.Length-8);
                             break;
                         case "fecha":
+                            texto = "fecha";
                             estimada = cajeroBean.fechaestimada;
                             break;             
                         default:
+                            texto = "fecha";
                             estimada = cajeroBean.fechaestimada;
                             break;
                     }
@@ -720,7 +798,7 @@ namespace CajerosBTBot.Dialogs
                 var menuHeroCard = new ThumbnailCard
                 {
                     //Subtitle = cajeroBean.conteo + " falla(s)",
-                    Title = "El cajero " + cajero.ToUpper() + " tiene "+fecha+" posible de solucion: "+estimada,
+                    Title = "El cajero " + cajero.ToUpper() + " tiene "+texto+" posible de solucion: "+estimada,
                     Subtitle = " Responsable :"+cajeroBean.responsable,                    
                     Images = new List<CardImage> {                       
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/solucion.jpg" }
@@ -820,7 +898,7 @@ namespace CajerosBTBot.Dialogs
 
 
 
-            private Attachment ShowOptions(List<Empresa> choices, string empresa)
+        private Attachment ShowOptions(List<Empresa> choices, string empresa)
         {
             int tam = empresa.Length;
 
@@ -850,6 +928,34 @@ namespace CajerosBTBot.Dialogs
              
              //.ToAttachment()
              //   );
+            return card.ToAttachment();
+        }
+
+
+        private Attachment ShowOptions2(List<string> choices)
+        {
+            
+
+            List<CardAction> messageOptions = new List<CardAction>();
+
+            for (int i = 0; i < choices.Count; i++)
+            {            
+                messageOptions.Add(new CardAction
+                {
+                    Title = choices[i],
+                   
+                });
+            }
+
+            var card = new HeroCard
+            {
+                
+                Title = "Puedes preguntar sobre.. ",           
+                Buttons = messageOptions,
+                
+            
+            };
+
             return card.ToAttachment();
         }
         private async Task ConnectOption(IDialogContext context, IAwaitable<Object> result) {

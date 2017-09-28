@@ -14,6 +14,7 @@ namespace CajerosBTBot.Enums
         SolicitarHistoricoFallasCajerosEmpresa,
         solicitarFechaSolucion,
         SolicitarResponsableCajero,
-        Saludo
+        Saludo,
+        Ayuda
     }
 }

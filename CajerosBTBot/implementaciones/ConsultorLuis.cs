@@ -45,8 +45,15 @@ namespace CajerosBTBot.implementaciones
                 var javaScriptSerializer = new JavaScriptSerializer();
                 var resultadoAnalisisTexto = javaScriptSerializer.Deserialize<ResultadoLuis>(contenidoRespuesta);
 
-            
 
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajero") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosEmpresa"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity ="desconocido";
+                    ent.score = 0.9;
+                    ent.type = "desconocido";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
 
                 if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("solicitarFechaSolucion")) {                                
                     EntityLuis ent = new EntityLuis();
@@ -56,9 +63,7 @@ namespace CajerosBTBot.implementaciones
                     resultadoAnalisisTexto.entities.Add(ent);             
                 }
 
-               /* if (resultadoAnalisisTexto.entities[0].type.Equals("cajero")) {
-                    Program.cajero = resultadoAnalisisTexto.entities[0].entity;
-                }    */    
+
                 return new ObjetoLuis()
                 {
                     Entidades = resultadoAnalisisTexto.entities.ToList(),
@@ -92,6 +97,8 @@ namespace CajerosBTBot.implementaciones
                     return Intensiones.SolicitarResponsableCajero;
                 case "Saludo":
                     return Intensiones.Saludo;
+                case "Ayuda":
+                    return Intensiones.Ayuda;
                 default:
                     return Intensiones.None;
             }
