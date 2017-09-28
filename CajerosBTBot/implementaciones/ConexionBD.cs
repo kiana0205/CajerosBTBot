@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Configuration;
 
 namespace CajerosBTBot.implementaciones
 {
@@ -16,13 +17,15 @@ namespace CajerosBTBot.implementaciones
            Boolean est = false;
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                builder.DataSource = "serviciobt.database.windows.net";
-                builder.UserID = "adminservbt";
-                builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                //SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                //builder.DataSource = "serviciobt.database.windows.net";
+                //builder.UserID = "adminservbt";
+                //builder.Password = "serv.bt0916";
+                //builder.InitialCatalog = "serviciobanorte-btdb";
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     connection.Open();
 
@@ -57,14 +60,16 @@ namespace CajerosBTBot.implementaciones
             try
             {
 
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+               /* SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     Console.WriteLine("\nQuery data example:");
                     Console.WriteLine("=========================================\n");
@@ -124,13 +129,16 @@ namespace CajerosBTBot.implementaciones
             List<Empresa> cajeros = new List<Empresa>();
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+               /* SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                // using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     connection.Open();
                     StringBuilder cn = new StringBuilder();
@@ -214,12 +222,17 @@ namespace CajerosBTBot.implementaciones
             List<Cajero> cajeros = new List<Cajero>();
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+               /* SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     connection.Open();
                     StringBuilder cn = new StringBuilder();
@@ -302,13 +315,16 @@ namespace CajerosBTBot.implementaciones
             Boolean est = false;
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+               /* SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     connection.Open();
 
@@ -358,14 +374,16 @@ namespace CajerosBTBot.implementaciones
             try
             {
 
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                /*SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     Console.WriteLine("\nQuery data example:");
                     Console.WriteLine("=========================================\n");
@@ -435,13 +453,16 @@ namespace CajerosBTBot.implementaciones
             List<Empresa> empresas = new List<Empresa>();
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                /*SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     Console.WriteLine("\nQuery data example:");
                     Console.WriteLine("=========================================\n");
@@ -500,13 +521,16 @@ namespace CajerosBTBot.implementaciones
             List<Tiempo> tiempo = new List<Tiempo>();
             try
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+               /* SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     Console.WriteLine("\nQuery data example:");
                     Console.WriteLine("=========================================\n");
@@ -551,14 +575,16 @@ namespace CajerosBTBot.implementaciones
             try
             {
 
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                /*SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "serviciobt.database.windows.net";
                 builder.UserID = "adminservbt";
                 builder.Password = "serv.bt0916";
-                builder.InitialCatalog = "serviciobanorte-btdb";
+                builder.InitialCatalog = "serviciobanorte-btdb";*/
 
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
 
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
                 {
                     Console.WriteLine("\nQuery data example:");
                     Console.WriteLine("=========================================\n");
