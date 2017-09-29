@@ -23,6 +23,8 @@ namespace CajerosBTBot.Dialogs
         //Hola Diana :)
         public Task StartAsync(IDialogContext context)
         {
+           
+
             context.Wait(MessageReceivedAsync);
 
             return Task.CompletedTask;
@@ -33,14 +35,14 @@ namespace CajerosBTBot.Dialogs
             var activity = context.MakeMessage();
             //Muestra el canal (facebook, skype, etc);
             //var canal = activity.ChannelId;
-            activity.Text = "Bienvenido ";
+           // activity.Text = "Bienvenido ";
             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 
             //var menuHeroCard = new HeroCard
             var menuHeroCard = new ThumbnailCard
             {
                 //Text = "Disponibilidad",
-                Title = "Banca Transaccional",
+                Title = "ChatBot Banca Transaccional",
                 Subtitle = "Cajeros Disponibilidad",
                 Images = new List<CardImage> {
                     new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
@@ -198,15 +200,16 @@ namespace CajerosBTBot.Dialogs
 
         private async Task ManejarSaludo(IDialogContext context)
         {
-            await context.PostAsync("Hola");
+            //await context.PostAsync("Hola");
             MostrarBienvenida(context);
+            ManejarAyuda(context);
 
-            PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
+            //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
 
         private async Task ManejarAyuda(IDialogContext context)
         {
-            await context.PostAsync("Has solicitado Ayuda ");
+            //await context.PostAsync("Has solicitado Ayuda ");
             MostrarAyuda(context); 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
