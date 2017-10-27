@@ -30,9 +30,7 @@ namespace CajerosBTBot
         {
             try
             {
-
-                
-             
+                            
                 if (activity.Type == ActivityTypes.Message)
                 {
                   

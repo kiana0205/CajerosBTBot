@@ -61,12 +61,12 @@ namespace CajerosBTBot.Dialogs
             var activity = context.MakeMessage();
             activity.Text = "Bienvenido al asistente de ayuda";
             List<string> choices = new List<string>();
-            choices.Add("Estatus de algun cajero");
-            choices.Add("Estatus de los cajeros de una empresa");
-            choices.Add("Fecha probable de solucion de un cajero");
-            choices.Add("Hora probable de solucion de un cajero");
+            choices.Add("Estatus de algun cajero");        
+            choices.Add("Fecha/hora probable solucion de un cajero");
+            //choices.Add("Hora probable de solucion de un cajero");
             choices.Add("Responsable de algun cajero");
             choices.Add("Fallas en el mes de un cajero");
+            choices.Add("Estatus de los cajeros de una empresa");
             choices.Add("Fallas en el mes de cajero por empresa");
 
             var result = ShowOptions2(choices);           
@@ -200,9 +200,10 @@ namespace CajerosBTBot.Dialogs
 
         private async Task ManejarSaludo(IDialogContext context)
         {
-            //await context.PostAsync("Hola");
+           
             MostrarBienvenida(context);
-            ManejarAyuda(context);
+            await context.PostAsync("Para solicitar ayuda sobre lo que puede consultar escriba: ayuda ");
+            //ManejarAyuda(context);
 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
@@ -955,8 +956,9 @@ namespace CajerosBTBot.Dialogs
                 
                 Title = "Puedes preguntar sobre.. ",           
                 Buttons = messageOptions,
-                
-            
+                //Text= messageOptions,
+
+
             };
 
             return card.ToAttachment();
