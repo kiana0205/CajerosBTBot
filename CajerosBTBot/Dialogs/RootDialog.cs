@@ -42,8 +42,8 @@ namespace CajerosBTBot.Dialogs
             var menuHeroCard = new ThumbnailCard
             {
                 //Text = "Disponibilidad",
-                Title = "ChatBot Banca Transaccional",
-                Subtitle = "Cajeros Disponibilidad",
+                Title = "Bienvenido ChatBot Banca Transaccional",
+                //Subtitle = "Cajeros Disponibilidad",
                 Images = new List<CardImage> {
                     new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
                 }
@@ -59,15 +59,15 @@ namespace CajerosBTBot.Dialogs
         private async void MostrarAyuda(IDialogContext context)
         {
             var activity = context.MakeMessage();
-            activity.Text = "Bienvenido al asistente de ayuda";
+            activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
             List<string> choices = new List<string>();
-            choices.Add("Estatus de algun cajero");        
-            choices.Add("Fecha/hora probable solucion de un cajero");
+            choices.Add("Estatus del cajero  XXXXX");        
+            choices.Add("Fecha probable solucion del cajero XXXXX");
             //choices.Add("Hora probable de solucion de un cajero");
-            choices.Add("Responsable de algun cajero");
-            choices.Add("Fallas en el mes de un cajero");
-            choices.Add("Estatus de los cajeros de una empresa");
-            choices.Add("Fallas en el mes de cajero por empresa");
+            //choices.Add("Responsable de algun cajero");
+            //choices.Add("Fallas en el mes de un cajero");
+            choices.Add("Estatus cajeros de la empresa XXXXX");
+            //choices.Add("Fallas en el mes de cajero por empresa");
 
             var result = ShowOptions2(choices);           
             activity.Attachments.Add(result);
@@ -202,8 +202,8 @@ namespace CajerosBTBot.Dialogs
         {
            
             MostrarBienvenida(context);
-            await context.PostAsync("Para solicitar ayuda sobre lo que puede consultar escriba: ayuda ");
-            //ManejarAyuda(context);
+            //await context.PostAsync("Para solicitar ayuda sobre lo que puede consultar escriba: ayuda ");
+            ManejarAyuda(context);
 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
@@ -954,7 +954,7 @@ namespace CajerosBTBot.Dialogs
             var card = new HeroCard
             {
                 
-                Title = "Puedes preguntar sobre.. ",           
+                Title = "Ejemplo de preguntas ",           
                 Buttons = messageOptions,
                 //Text= messageOptions,
 
