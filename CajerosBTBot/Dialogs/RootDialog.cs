@@ -59,7 +59,27 @@ namespace CajerosBTBot.Dialogs
         private async void MostrarAyuda(IDialogContext context)
         {
             var activity = context.MakeMessage();
-            activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
+
+
+           // activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+            //var menuHeroCard = new HeroCard
+            var menuHeroCard = new ThumbnailCard
+            {
+                //Text = "Disponibilidad",
+                Text = "Bienvenido ChatBot Banca Transaccional",
+                //Title = "Bienvenido ChatBot Banca Transaccional",
+                //Subtitle = "Cajeros Disponibilidad",
+                Images = new List<CardImage> {
+                    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
+                }
+            }.ToAttachment();
+
+            activity.Attachments = new List<Attachment>();
+            activity.Attachments.Add(menuHeroCard);
+
+
+           // activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
             List<string> choices = new List<string>();
             choices.Add("Estatus del cajero  XXXXX");        
             choices.Add("Fecha probable solucion del cajero XXXXX");
@@ -201,7 +221,7 @@ namespace CajerosBTBot.Dialogs
         private async Task ManejarSaludo(IDialogContext context)
         {
            
-            MostrarBienvenida(context);
+            //MostrarBienvenida(context);
             //await context.PostAsync("Para solicitar ayuda sobre lo que puede consultar escriba: ayuda ");
             ManejarAyuda(context);
 
@@ -953,8 +973,10 @@ namespace CajerosBTBot.Dialogs
 
             var card = new HeroCard
             {
-                
-                Title = "Ejemplo de preguntas ",           
+
+                //Title = "En este chat puedes preguntar sobre informacion de cajeros. ",
+                Subtitle = "En este chat puedes preguntar sobre informacion de cajeros. ",
+                Text ="Ejemplo de preguntas :",
                 Buttons = messageOptions,
                 //Text= messageOptions,
 
