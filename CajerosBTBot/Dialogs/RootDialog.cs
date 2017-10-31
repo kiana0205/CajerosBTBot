@@ -60,9 +60,18 @@ namespace CajerosBTBot.Dialogs
         {
             var activity = context.MakeMessage();
 
+            /* activity.SuggestedActions = new SuggestedActions()
+             {
+                 Actions=new List<CardAction>(){
+                     new CardAction(){Title="Estatus del cajero  XXXXX", Type=ActionTypes.ImBack, Value="Estatus del cajero  XXXXX" },
+                     new CardAction(){Title="Fecha probable solucion del cajero XXXXX", Type=ActionTypes.ImBack, Value="Fecha probable solucion del cajero XXXXX"  },
+                     new CardAction(){Title="Estatus cajeros de la empresa XXXXX", Type=ActionTypes.ImBack, Value="Estatus cajeros de la empresa XXXXX"  },
+                 }
+             };*/
 
-           // activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
 
+            // activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+           
             //var menuHeroCard = new HeroCard
             var menuHeroCard = new ThumbnailCard
             {
@@ -125,8 +134,23 @@ namespace CajerosBTBot.Dialogs
                     await ManejarAyuda(context);
                     break;
                 case Intensiones.None:
-                    await context.PostAsync("No entendí la solicitud");
-                    context.Wait(MessageReceivedAsync);
+                    //await context.PostAsync("No entendí la solicitud");
+                    //context.Wait(MessageReceivedAsync);
+                    var activity2 = context.MakeMessage();
+                    activity2.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard6 = new ThumbnailCard
+                    {
+                        Subtitle = "Debes especificar un cajero o nombre de la empresa",
+                        Title = "No entendi la solicitud ",
+                        Text = "Utiliza la palabra cajero o empresa dentro de la solicitud",
+                        Images = new List<CardImage> {
+                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
+                        }
+                    }.ToAttachment();
+
+                    activity2.Attachments = new List<Attachment>();
+                    activity2.Attachments.Add(menuHeroCard6);
+                    await context.PostAsync(activity2);
                     break;
                 case Intensiones.SolicitarEstatusCajero:
                     if (objetoLuis.Entidades[0].entity.Equals("desconocido"))
@@ -230,6 +254,8 @@ namespace CajerosBTBot.Dialogs
 
         private async Task ManejarAyuda(IDialogContext context)
         {
+         
+
             //await context.PostAsync("Has solicitado Ayuda ");
             MostrarAyuda(context); 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
@@ -958,7 +984,10 @@ namespace CajerosBTBot.Dialogs
 
         private Attachment ShowOptions2(List<string> choices)
         {
-            
+
+
+          
+
 
             List<CardAction> messageOptions = new List<CardAction>();
 
