@@ -343,7 +343,7 @@ namespace CajerosBTBot.implementaciones
                     cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
                     cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
                     cn.Append(" where f.id_tipo_producto = 2");
-                    cn.Append(" and e.empresa like  '" +empresa+ "%'");
+                    cn.Append(" and e.empresa like  '%" +empresa+ "%'");
                     //cn.Append(" group by a.id_empresa ");
                     String res = cn.ToString();
                     SqlCommand comm = new SqlCommand(res, connection);

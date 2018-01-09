@@ -494,7 +494,7 @@ namespace CajerosBTBot.Dialogs
                             Title = "La empresa " + empresa.ToUpper() + " tiene las siguientes fallas: ",
                             Images = new List<CardImage> {
                         new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
-                    }
+                        }
                         }.ToAttachment();
 
                         activity.Attachments = new List<Attachment>();
@@ -573,7 +573,7 @@ namespace CajerosBTBot.Dialogs
 
                     var activity = context.MakeMessage();
 
-                    activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper() +" o la empresa como tal la solicitaste no se encuentra";
+                    activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
 
                     await context.PostAsync(activity);
 
