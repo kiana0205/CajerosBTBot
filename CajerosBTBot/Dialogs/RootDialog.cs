@@ -63,7 +63,7 @@ namespace CajerosBTBot.Dialogs
             /* activity.SuggestedActions = new SuggestedActions()
              {
                  Actions=new List<CardAction>(){
-                     new CardAction(){Title="Estatus del cajero  XXXXX", Type=ActionTypes.ImBack, Value="Estatus del cajero  XXXXX" },
+                     new CardAction(){Title="Estatus del cajero  XXXXX", Type=ActionTypes.ImBack, Value="hola" },
                      new CardAction(){Title="Fecha probable solucion del cajero XXXXX", Type=ActionTypes.ImBack, Value="Fecha probable solucion del cajero XXXXX"  },
                      new CardAction(){Title="Estatus cajeros de la empresa XXXXX", Type=ActionTypes.ImBack, Value="Estatus cajeros de la empresa XXXXX"  },
                  }

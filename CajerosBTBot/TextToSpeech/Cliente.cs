@@ -215,7 +215,7 @@ namespace CajerosBTBot.TextToSpeech
             var ssmlDoc = new XDocument(
                               new XElement("speak",
                                   new XAttribute("version", "1.0"),
-                                  new XAttribute(XNamespace.Xml + "lang", "en-US"),
+                                  new XAttribute(XNamespace.Xml + "lang", "es-mx"),
                                   new XElement("voice",
                                       new XAttribute(XNamespace.Xml + "lang", locale),
                                       new XAttribute(XNamespace.Xml + "gender", gender),

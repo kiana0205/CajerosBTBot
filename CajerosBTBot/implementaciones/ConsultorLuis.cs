@@ -63,6 +63,22 @@ namespace CajerosBTBot.implementaciones
                     resultadoAnalisisTexto.entities.Add(ent);             
                 }
 
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("None"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    if (resultadoAnalisisTexto.topScoringIntent.score <=8.0 ) {
+                   
+                            ent.entity = "noidentifico";
+                            ent.score = 0.9;
+                            ent.type = resultadoAnalisisTexto.query;
+
+                    }
+                    //EntityLuis ent = new EntityLuis();
+                    //ent.entity = "noidentifico";
+                    //ent.score = 0.9;
+                    //ent.type = "noidentifico";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
 
                 return new ObjetoLuis()
                 {
