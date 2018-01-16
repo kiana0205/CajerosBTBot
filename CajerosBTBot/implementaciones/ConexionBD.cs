@@ -368,6 +368,49 @@ namespace CajerosBTBot.implementaciones
             return est;
         }
 
+
+        public Boolean obtenerEstatusCajerosGrupo(string grupo)
+        {
+            Boolean est = false;
+            try
+            {         
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    connection.Open();
+
+                    var emp = String.Empty;
+
+                    StringBuilder cn = new StringBuilder();
+                    cn.Append(" select count(*) from falla_f_fallas_diaria f ");
+                    cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    cn.Append(" where f.id_tipo_producto = 2");
+                    cn.Append(" and e.grupo like  '%" + grupo + "%'");              
+                    String res = cn.ToString();
+                    SqlCommand comm = new SqlCommand(res, connection);
+                    Int32 count = (Int32)comm.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        est = true;
+
+                    }
+                    else
+                    {
+                        est = false;
+                    }
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return est;
+        }
+
         public List<Empresa> ObtenerFallasEmpresa(string empresa)
         {
             List<Empresa> cajeros = new List<Empresa>();
@@ -428,6 +471,63 @@ namespace CajerosBTBot.implementaciones
                             cajeroBean.id_empresa = myReader["id_empresa"].ToString();
                           //  cajeroBean.fecha = myReader["fecha"].ToString();
                           // cajeroBean.conteo = myReader["conteo"].ToString();
+                            cajeroBean.tipoFalla = myReader["tipoFalla"].ToString();
+                            cajeroBean.folio = myReader["folio"].ToString();
+
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return cajeros;
+        }
+
+        public List<Grupo> ObtenerFallasGrupo(string grupo)
+        {
+            List<Grupo> cajeros = new List<Grupo>();
+            try
+            {
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("SELECT a.id_cajero as cajero, e.grupo,e.empresa, s.tipo_falla as tipoFalla, e.id_grupo, f.folio  ");
+                    sb.Append("FROM falla_f_fallas_diaria f");
+                    sb.Append(" left join falla_d_fallas s on s.id_falla=f.id_falla ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa");
+                    sb.Append(" where e.grupo like '%' +replace('" + grupo + "',' ','_') +'%'");
+                    sb.Append(" and f.id_tipo_producto = 2");
+                    String sql = sb.ToString();
+
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Grupo cajeroBean = new Grupo();
+
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.grupo= myReader["grupo"].ToString();
+                            cajeroBean.empresa = myReader["empresa"].ToString();
+                            cajeroBean.id_grupo = myReader["id_grupo"].ToString();
                             cajeroBean.tipoFalla = myReader["tipoFalla"].ToString();
                             cajeroBean.folio = myReader["folio"].ToString();
 
@@ -514,6 +614,60 @@ namespace CajerosBTBot.implementaciones
 
 
             return empresas;
+        }
+
+
+        public List<Grupo> ObtenerGrupos(string grupo)
+        {
+            List<Grupo> grupos = new List<Grupo>();
+            try
+            {
+ 
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+
+                    connection.Open();
+
+                    var emp = String.Empty;
+      
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  e.id_grupo, e.grupo from falla_f_fallas_diaria f ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto  ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");
+                    sb.Append(" where f.id_tipo_producto = 2  and e.grupo like '%" + grupo + "%'");
+                    sb.Append(" group by e.id_grupo, e.grupo");
+                    sb.Append(" order by e.grupo desc");
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Grupo cajeroBean = new Grupo();
+                            cajeroBean.grupo = myReader["grupo"].ToString();
+                            cajeroBean.id_grupo = myReader["id_grupo"].ToString();
+                            grupos.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+
+            return grupos;
         }
 
         public List<Tiempo> obtenerPeriodoSolucion(string cajero)

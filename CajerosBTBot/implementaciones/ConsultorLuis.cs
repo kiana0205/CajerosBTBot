@@ -46,7 +46,7 @@ namespace CajerosBTBot.implementaciones
                 var resultadoAnalisisTexto = javaScriptSerializer.Deserialize<ResultadoLuis>(contenidoRespuesta);
 
 
-                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajero") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosEmpresa"))
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajero") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosEmpresa") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosGrupo"))
                 {
                     EntityLuis ent = new EntityLuis();
                     ent.entity ="desconocido";
@@ -101,10 +101,12 @@ namespace CajerosBTBot.implementaciones
                     return Intensiones.SolicitarEstatusCajero;
                 case "SolicitarEstatusCajerosEmpresa":
                     return Intensiones.SolicitarEstatusCajerosEmpresa;
+                case "SolicitarEstatusCajeroGrupo":
+                    return Intensiones.SolicitarEstatusCajerosGrupo;
                 //case "SolicitarFallasCajerosEmpresa":
                 //    return Intensiones.SolicitarFallasCajerosEmpresa;
                 case "SolicitarHistoricoFallasCajerosEmpresa":
-                    return Intensiones.SolicitarHistoricoFallasCajerosEmpresa;
+                    return Intensiones.SolicitarHistoricoFallasCajerosEmpresa;                
                 case "SolicitarHistoricoFallasCajeros":
                     return Intensiones.SolicitarHistoricoFallasCajeros;
                 case "solicitarFechaSolucion":

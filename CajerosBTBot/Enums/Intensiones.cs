@@ -10,6 +10,7 @@ namespace CajerosBTBot.Enums
         None,
         SolicitarEstatusCajero,
         SolicitarEstatusCajerosEmpresa,
+        SolicitarEstatusCajerosGrupo,
         SolicitarHistoricoFallasCajeros,
         SolicitarHistoricoFallasCajerosEmpresa,
         solicitarFechaSolucion,

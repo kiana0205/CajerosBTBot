@@ -120,6 +120,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Bean\Cajero.cs" />
     <Compile Include="Bean\Empresa.cs" />
+    <Compile Include="Bean\Grupo.cs" />
     <Compile Include="Bean\LuisBean.cs" />
     <Compile Include="Bean\ResultadoTextAnalytics.cs" />
     <Compile Include="Bean\Tiempo.cs" />
