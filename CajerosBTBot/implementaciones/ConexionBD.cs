@@ -406,7 +406,7 @@ namespace CajerosBTBot.implementaciones
                     sb.Append(" left join falla_d_fallas s on s.id_falla=f.id_falla ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
                     sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa");
-                    sb.Append(" where e.empresa like '%" + empresa + "%'");
+                    sb.Append(" where e.empresa like '%' +replace('" + empresa + "',' ','_') +'%'");
                     sb.Append(" and f.id_tipo_producto = 2");
                     //sb.Append(" order by empresa asc, tipo_falla desc");
                     // sb.Append("JOIN [SalesLT].[Product] p ");

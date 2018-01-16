@@ -1,13 +1,17 @@
-﻿using System.Net;
+﻿namespace CajerosBTBot
+{
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System;
-using Microsoft.Bot.Builder.Dialogs.Internals;
+//using Microsoft.Bot.Builder.Dialogs.Internals;
+using CajerosBTBot.Dialogs;
 using Autofac;
 using CajerosBTBot.Services;
+
 
 using System.Diagnostics;
 using System.IO;
@@ -16,8 +20,6 @@ using System.Net.Http.Headers;
 using System.Web;
 
 
-namespace CajerosBTBot
-{
     [BotAuthentication]
     public class MessagesController : ApiController
     {
@@ -33,46 +35,47 @@ namespace CajerosBTBot
                             
                 if (activity.Type == ActivityTypes.Message)
                 {
-                  
+
                     await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
-                  /*  var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                    string message;
+                    //await Conversation.SendAsync(activity, () => new RootDialog());
+                    /*  var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                      string message;
 
-                    try
-                    {
-                        var audioAttachment = activity.Attachments?.FirstOrDefault(a => a.ContentType.Equals("audio/wav") || a.ContentType.Equals("application/octet-stream"));
-                        if (audioAttachment != null)
-                        {
-                            var stream = await GetAudioStream(connector, audioAttachment);
-                            var text = await this.speechService.GetTextFromAudioAsync(stream);
-                            message = ProcessText(text);
-                        }
-                        else
-                        {
-                            message = "Did you upload an audio file? I'm more of an audible person. Try sending me a wav file";
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        message = "Oops! Something went wrong. Try again later";
-                        if (e is HttpException)
-                        {
-                            var httpCode = (e as HttpException).GetHttpCode();
-                            if (httpCode == 401 || httpCode == 403)
-                            {
-                                message += $" [{e.Message} - hint: check your API KEY at web.config]";
-                            }
-                            else if (httpCode == 408)
-                            {
-                                message += $" [{e.Message} - hint: try send an audio shorter than 15 segs]";
-                            }
-                        }
+                      try
+                      {
+                          var audioAttachment = activity.Attachments?.FirstOrDefault(a => a.ContentType.Equals("audio/wav") || a.ContentType.Equals("application/octet-stream"));
+                          if (audioAttachment != null)
+                          {
+                              var stream = await GetAudioStream(connector, audioAttachment);
+                              var text = await this.speechService.GetTextFromAudioAsync(stream);
+                              message = ProcessText(text);
+                          }
+                          else
+                          {
+                              message = "Did you upload an audio file? I'm more of an audible person. Try sending me a wav file";
+                          }
+                      }
+                      catch (Exception e)
+                      {
+                          message = "Oops! Something went wrong. Try again later";
+                          if (e is HttpException)
+                          {
+                              var httpCode = (e as HttpException).GetHttpCode();
+                              if (httpCode == 401 || httpCode == 403)
+                              {
+                                  message += $" [{e.Message} - hint: check your API KEY at web.config]";
+                              }
+                              else if (httpCode == 408)
+                              {
+                                  message += $" [{e.Message} - hint: try send an audio shorter than 15 segs]";
+                              }
+                          }
 
-                        Trace.TraceError(e.ToString());
-                    }
+                          Trace.TraceError(e.ToString());
+                      }
 
-                    Activity reply = activity.CreateReply(message);
-                    await connector.Conversations.ReplyToActivityAsync(reply);*/
+                      Activity reply = activity.CreateReply(message);
+                      await connector.Conversations.ReplyToActivityAsync(reply);*/
 
                 }
                 else
@@ -96,14 +99,14 @@ namespace CajerosBTBot
 
         private static async Task EnviarMensajeUsuario(string mensaje, Activity activity)
         {
-            using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
+          /*  using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
             {
                 var client = scope.Resolve<IConnectorClient>();
                 var reply = activity.CreateReply();
                 reply.Text = mensaje;
 
                 await client.Conversations.ReplyToActivityAsync(reply);
-            }
+            }*/
         }
 
 
@@ -165,5 +168,33 @@ namespace CajerosBTBot
         }
 
 
+        private Activity HandleSystemMessage(Activity message)
+        {
+            if (message.Type == ActivityTypes.DeleteUserData)
+            {
+                // Implement user deletion here
+                // If we handle user deletion, return a real message
+            }
+            else if (message.Type == ActivityTypes.ConversationUpdate)
+            {
+                // Handle conversation state changes, like members being added and removed
+                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
+                // Not available in all channels
+            }
+            else if (message.Type == ActivityTypes.ContactRelationUpdate)
+            {
+                // Handle add/remove from contact lists
+                // Activity.From + Activity.Action represent what happened
+            }
+            else if (message.Type == ActivityTypes.Typing)
+            {
+                // Handle knowing tha the user is typing
+            }
+            else if (message.Type == ActivityTypes.Ping)
+            {
+            }
+
+            return null;
+        }
     }
 }
