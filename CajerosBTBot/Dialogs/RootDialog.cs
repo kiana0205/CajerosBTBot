@@ -645,7 +645,7 @@ using Newtonsoft.Json;
                            //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                            //Title = "No entendi la solicitud ",
                            Subtitle = "No entendi la solicitud",
-                           Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud"
+                           Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud + nombre del elemento"
                           // Images = new List<CardImage> {
                           // new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
                           // }
@@ -665,7 +665,7 @@ using Newtonsoft.Json;
                                //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                                //Title = "No entendi la solicitud ",
                                Subtitle = "No entendi la solicitud",
-                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud"
+                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud + nombre del elemento"
                                //Images = new List<CardImage> {
                                //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
                                //}   
@@ -691,7 +691,7 @@ using Newtonsoft.Json;
                            {
                                //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                                Subtitle = "No entendi la solicitud ",
-                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud"
+                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud + nombre del elemento"
                                //   Images = new List<CardImage> {
                                //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
                                //}
@@ -1243,10 +1243,8 @@ using Newtonsoft.Json;
                     var empresas = bd.ObtenerFallasEmpresa(empresa.ToUpper());
                     if (empresas != null && empresas.Count > 0)
                     {
-                        //Empresa cajeroBean = empresas[0];
-
                         var activity = context.MakeMessage();
-                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                       /* activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard = new ThumbnailCard
                         {
                             //Subtitle = cajeroBean.conteo + " falla(s)",
@@ -1258,7 +1256,6 @@ using Newtonsoft.Json;
 
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
-
 
                         await context.PostAsync(activity);
 
@@ -1302,9 +1299,43 @@ using Newtonsoft.Json;
                             }
 
                             await context.PostAsync("Cajero: " + cajeroBean.cajero + ",  Falla: " + tipofalla + ",  Folio: " + folio);
+                        }*/
 
 
+                        List<object> opt = new List<object>();
+                        var titulo = "La empresa tiene las siguientes fallas: ";
+                        foreach (Empresa element in empresas)
+                        {
+                            var tipofalla2 = String.Empty;
+                            switch (element.tipoFalla)
+                            {
+                                case "ComunicacionEnergia":
+                                    tipofalla2 = "Cajero sin energía";
+                                    break;
+                                case "ErrorSinEfectivo":
+                                    tipofalla2 = "Cajero sin efectivo";
+                                    break;
+                                case "ModoSupervisor":
+                                    tipofalla2 = "Modo Supervisor";
+                                    break;
+                                case "FallaHardware":
+                                    tipofalla2 = "Falla en el hardware";
+                                    break;
+                                case "ProblemaLocal":
+                                    tipofalla2 = "Cajero con problema local";
+                                    break;
+                                case "TrxsNoMonetarias":
+                                    tipofalla2 = "Transacciones no monetarias";
+                                    break;
+                                default:
+                                    tipofalla2 = "Sin identificar";
+                                    break;
+                            }
+                            var menu = element.cajero + "   " + tipofalla2 + "  Folio:" + element.folio;
+                            opt.Add(menu);
                         }
+
+                        await opcionesAcciones2(context, opt, titulo);
 
                         await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
                     }
@@ -1317,9 +1348,9 @@ using Newtonsoft.Json;
                             Text = "Algo más en que le podamos ayudar?",
                             Subtitle = "Verifique el nombre de la empresa",
                             //Title = "No se identifico el cajero como parte de banca transaccional",
-                            Images = new List<CardImage> {
-                        new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
-                    }
+                            //Images = new List<CardImage> {
+                            //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
+                            //}
                         }.ToAttachment();
 
                         activity.Attachments = new List<Attachment>();
@@ -1331,12 +1362,21 @@ using Newtonsoft.Json;
                 {
 
                     var activity = context.MakeMessage();
-
-                    activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
-
+                 /*   activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
                     await context.PostAsync(activity);
+                    await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
 
-                    await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                 
+                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard = new ThumbnailCard
+                    {
+                        Text = "Algo más en que le podamos ayudar?",
+                        Subtitle = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper(),
+                    }.ToAttachment();
+
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                    await context.PostAsync(activity);
                 }
             }
             context.Wait(MessageReceivedAsync);
@@ -1350,8 +1390,8 @@ using Newtonsoft.Json;
             StringBuilder sb = new StringBuilder();
             if (obtienemepresa.Count > 1)
             {
-                List<Empresa> choices = new List<Empresa>();
-                for (int i = 0; i < obtienemepresa.Count; i++)
+                //List<Empresa> choices = new List<Empresa>();
+                /*for (int i = 0; i < obtienemepresa.Count; i++)
                 {
 
                     choices.Add(new Empresa(obtienemepresa[i].grupo, obtienemepresa[i].id_grupo));
@@ -1360,7 +1400,27 @@ using Newtonsoft.Json;
                 var activity = context.MakeMessage();
                 activity.Text = "Se encontro mas de un grupo. Escriba cual desea consultar ";
                 activity.Attachments.Add(result);
+                await context.PostAsync(activity);*/
+                List<object> opt = new List<object>();
+                var titulo = "Se encontro mas de un grupo con ese criterio ";
+                foreach (Grupo element in obtienemepresa)
+                {
+                    var menu = element.grupo;
+                    opt.Add(menu);
+                }
+                await opcionesAcciones2(context, opt, titulo);
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "Escriba la opcion + 'grupo' + nombre del grupo que desea consultar ",
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
                 await context.PostAsync(activity);
+
             }
             else {
                 var estatus = bd.obtenerEstatusCajerosGrupo(grupo.ToUpper());
@@ -1371,7 +1431,7 @@ using Newtonsoft.Json;
                     {
     
                         var activity = context.MakeMessage();
-                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                      /*  activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard = new ThumbnailCard
                         {
                             //Subtitle = cajeroBean.conteo + " falla(s)",
@@ -1430,6 +1490,44 @@ using Newtonsoft.Json;
 
                         }
 
+                        await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
+
+
+                        List<object> opt = new List<object>();
+                        var titulo = "El grupo tiene las siguientes fallas: ";
+                        foreach (Grupo element in empresas)
+                        {
+                            var tipofalla2 = String.Empty;
+                            switch (element.tipoFalla)
+                            {
+                                case "ComunicacionEnergia":
+                                    tipofalla2 = "Cajero sin energía";
+                                    break;
+                                case "ErrorSinEfectivo":
+                                    tipofalla2 = "Cajero sin efectivo";
+                                    break;
+                                case "ModoSupervisor":
+                                    tipofalla2 = "Modo Supervisor";
+                                    break;
+                                case "FallaHardware":
+                                    tipofalla2 = "Falla en el hardware";
+                                    break;
+                                case "ProblemaLocal":
+                                    tipofalla2 = "Cajero con problema local";
+                                    break;
+                                case "TrxsNoMonetarias":
+                                    tipofalla2 = "Transacciones no monetarias";
+                                    break;
+                                default:
+                                    tipofalla2 = "Sin identificar";
+                                    break;
+                            }
+                            var menu = element.cajero + "   " + tipofalla2 + "  Folio:" + element.folio;
+                            opt.Add(menu);
+                        }
+
+                        await opcionesAcciones2(context, opt, titulo);
+
                         await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
                     }
                     else
@@ -1455,11 +1553,19 @@ using Newtonsoft.Json;
 
                     var activity = context.MakeMessage();
 
-                    activity.Text = "No se encontraron fallas en los cajeros del grupo " + grupo.ToUpper();
-
+                    /*activity.Text = "No se encontraron fallas en los cajeros del grupo " + grupo.ToUpper();
                     await context.PostAsync(activity);
+                    await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
+                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard = new ThumbnailCard
+                    {
+                        Text = "Algo más en que le podamos ayudar?",
+                        Subtitle = "No se encontraron fallas en los cajeros del grupo " + grupo.ToUpper(),
+                    }.ToAttachment();
 
-                    await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                    await context.PostAsync(activity);
                 }
             }
             context.Wait(MessageReceivedAsync);
