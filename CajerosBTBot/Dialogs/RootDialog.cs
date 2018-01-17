@@ -3,6 +3,7 @@ namespace CajerosBTBot.Dialogs
 { 
 using System;
 using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
@@ -15,6 +16,7 @@ using System.Text;
 using global::AdaptiveCards;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+ 
 
 
     //namespace CajerosBTBot.Dialogs
@@ -689,10 +691,10 @@ using Newtonsoft.Json;
                            {
                                //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                                Subtitle = "No entendi la solicitud ",
-                               Text = "Utiliza la palabra cajero o empresa dentro de la solicitud"
-                            //   Images = new List<CardImage> {
-                           //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
-                           //}
+                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud"
+                               //   Images = new List<CardImage> {
+                               //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
+                               //}
                            }.ToAttachment();
 
                            activity.Attachments = new List<Attachment>();
@@ -815,7 +817,7 @@ using Newtonsoft.Json;
              await context.PostAsync(reply);
              context.Wait(MessageReceivedAsync);*/
 
-            PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "Bienvenido. Quieres consultar por?", "Opcion no valida", 4);
+            PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "Bienvenido. Quieres consultar por?", "Opcion no valida", 4,PromptStyle.Auto);
 
         }
 
@@ -823,18 +825,23 @@ using Newtonsoft.Json;
             try {
                 string optionSelected = await result;
                 switch (optionSelected) {
-                    case CajeroOption:                      
-                        await context.PostAsync($"Que deseas consultar del {CajeroOption}?..");
-                        await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'cajero' + el id el {CajeroOption}");
-                        context.Wait(MessageReceivedAsync);
+                    case CajeroOption:
+                        await opcionesAcciones(context, CajeroOption);                    
+                        //await context.PostAsync($"Que deseas consultar del {CajeroOption}?..");
+                        //await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'cajero' + el id el {CajeroOption}");
+                        //context.Wait(MessageReceivedAsync);
                         break;
                     case EmpresaOption:
-                        await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'empresa' + el nombre de la {EmpresaOption} ...");
-                        context.Wait(MessageReceivedAsync);
+                        await opcionesAcciones(context, EmpresaOption);
+                        //await context.PostAsync($"Que deseas consultar de la {EmpresaOption}?..");
+                        //await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'empresa' + el nombre de la {EmpresaOption} ...");
+                        //context.Wait(MessageReceivedAsync);
                         break;
                     case GrupoOption:
-                        await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'grupo' + el nombre del  {GrupoOption} ...");
-                        context.Wait(MessageReceivedAsync);
+                        await opcionesAcciones(context, GrupoOption);
+                        //await context.PostAsync($"Que deseas consultar del {GrupoOption}?..");
+                        //await context.PostAsync($"Escribe 'estatus' o 'responsable' o 'historico' + 'grupo' + el nombre del  {GrupoOption} ...");
+                        //context.Wait(MessageReceivedAsync);
                         break;
 
                 }
@@ -853,58 +860,191 @@ using Newtonsoft.Json;
             MostrarAyuda(context); 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         }
-
-
-       /* private async Task RecibirEstadoUsuario(IDialogContext context, IAwaitable<string> estadoUsuarioAwaitable)
+        private async Task opcionesAcciones(IDialogContext context, string opcion)            
         {
-            var estadoUsuario = await estadoUsuarioAwaitable;
-
-            var consultor = new ConsultorLuis();
-            var estadoDeAnimo = await consultor.ConsultarTextAnalytics(estadoUsuario);
-            string respuestaParaUsuario = String.Empty;
-
-            var activity = context.MakeMessage();
-            activity.Attachments = new List<Attachment>();
-
-            activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-
-            switch (estadoDeAnimo)
+            AdaptiveCard card = new AdaptiveCard()
             {
-                case Enums.EstadoDeAnimo.Bueno:
-                    activity.Attachments.Add(new Attachment
-                    {
-                        ContentType = "image/jpg",
-                        ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/feliz.jpg"
-                    }
-                    );
-                    respuestaParaUsuario = "¡Excelente me da gusto saber eso!";
-                    break;
-                case Enums.EstadoDeAnimo.Regular:
-                    activity.Attachments.Add(new Attachment
-                    {
-                        ContentType = "image/jpg",
-                        ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/confundido.jpg"
-                    }
-                    );
-                    respuestaParaUsuario = "No estoy seguro como se siente, pero confio que estará bien";
-                    break;
-                default:
-                case Enums.EstadoDeAnimo.Malo:
-                    activity.Attachments.Add(new Attachment
-                    {
-                        ContentType = "image/jpg",
-                        ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/triste.jpg"
-                    }
-                    );
-                    respuestaParaUsuario = "Lamento saber eso, espero mejore su día.";
-                    break;
-            }
+                Body = new List<CardElement>()
+                            {
+                                new Container()
+                                {
+                                      Items = new List<CardElement>(){
+                                          //columna 1
+                                          new ColumnSet()
+                                          {
+                                              Columns= new List<Column>{                                          
+                                                  new Column()
+                                                  {
+                                                      Size=ColumnSize.Auto,
+                                                      Items = new List<CardElement>(){
+                                                           new TextBlock(){
+                                                              Text = "Que opcion deseas consultar?.."
+                                                          },
+                                                          new TextBlock(){
+                                                              Text ="Estatus "
+                                                          },
+                                                          new TextBlock(){
+                                                              Text ="Responsable "
+                                                          },
+                                                          new TextBlock(){
+                                                              Text = "Historico "
+                                                          },
+                                                          new TextBlock(){
+                                                              Text = $"Escribe la opcion + '{opcion}' + el nombre de {opcion}"
+                                                          }
+                                                      }
+                                                  }
 
-            activity.Text = respuestaParaUsuario;
-            await context.PostAsync(activity);
+                                              }
+                                          }
+                                      }
+                                }
+                            },
 
-            await context.PostAsync("¿En que le podemos ayudar?");
-        }*/
+            };
+
+            Attachment attachment = new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = card
+            };
+
+            var reply = context.MakeMessage();
+            reply.Attachments.Add(attachment);
+
+            await context.PostAsync(reply);
+
+            context.Wait(MessageReceivedAsync);
+        }
+
+        private async Task opcionesAcciones2(IDialogContext context, List<object> lista, string titulo)
+        {
+            var opciones = this.GetOpciones(lista);
+            //var title = $"Estas son las opciones";
+            var title = titulo;
+            var intro = new List<CardElement>()
+                {
+                    new TextBlock(){
+                        Text=title,
+                        Size = TextSize.Normal,
+                        Weight = TextWeight.Normal,
+                        Speak =$"<s>{title}</s>"
+                    }
+                };
+            var rows = Split(opciones, 15)
+                .Select(group => new ColumnSet()
+                {
+                    Columns = new List<Column>(group.Select(AsHotelItem))
+
+                });
+
+            var card = new AdaptiveCard()
+            {
+                Body = intro.Union(rows).ToList()
+            };
+
+            Attachment attachment = new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = card
+            };
+
+            var reply = context.MakeMessage();
+            reply.Attachments.Add(attachment);
+
+            await context.PostAsync(reply);
+        }
+
+        private IEnumerable<MenuCajeros> GetOpciones(List<object> opcion)
+        {
+            var opciones = new List<MenuCajeros>();
+            foreach (string element in opcion) {
+                MenuCajeros menu = new MenuCajeros() {opcion=element};
+                opciones.Add(menu);
+            }            
+            return opciones;
+        }
+
+        private Column AsHotelItem(MenuCajeros menu)
+        {
+            return new Column()
+            {
+                //Size = "8",
+                Size = ColumnSize.Auto,
+                Items = new List<CardElement>()
+                {
+                    new TextBlock()
+                    {
+                        Text = menu.opcion,
+                        Speak = $"<s>{menu.opcion}</s>",
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Wrap = false,    
+                        //Weight = TextWeight.Bolder
+                        Weight = TextWeight.Normal
+                    }
+
+                }
+               
+            };
+        }
+        public static IEnumerable<IEnumerable<T>> Split<T>(IEnumerable<T> list, int parts)
+        {
+            return list.Select((item, ix) => new { ix, item })
+                       .GroupBy(x => x.ix % parts)
+                       .Select(x => x.Select(y => y.item));
+        }
+
+
+        /* private async Task RecibirEstadoUsuario(IDialogContext context, IAwaitable<string> estadoUsuarioAwaitable)
+         {
+             var estadoUsuario = await estadoUsuarioAwaitable;
+
+             var consultor = new ConsultorLuis();
+             var estadoDeAnimo = await consultor.ConsultarTextAnalytics(estadoUsuario);
+             string respuestaParaUsuario = String.Empty;
+
+             var activity = context.MakeMessage();
+             activity.Attachments = new List<Attachment>();
+
+             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+             switch (estadoDeAnimo)
+             {
+                 case Enums.EstadoDeAnimo.Bueno:
+                     activity.Attachments.Add(new Attachment
+                     {
+                         ContentType = "image/jpg",
+                         ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/feliz.jpg"
+                     }
+                     );
+                     respuestaParaUsuario = "¡Excelente me da gusto saber eso!";
+                     break;
+                 case Enums.EstadoDeAnimo.Regular:
+                     activity.Attachments.Add(new Attachment
+                     {
+                         ContentType = "image/jpg",
+                         ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/confundido.jpg"
+                     }
+                     );
+                     respuestaParaUsuario = "No estoy seguro como se siente, pero confio que estará bien";
+                     break;
+                 default:
+                 case Enums.EstadoDeAnimo.Malo:
+                     activity.Attachments.Add(new Attachment
+                     {
+                         ContentType = "image/jpg",
+                         ContentUrl = "https://storageserviciobt.blob.core.windows.net/imagebot/triste.jpg"
+                     }
+                     );
+                     respuestaParaUsuario = "Lamento saber eso, espero mejore su día.";
+                     break;
+             }
+
+             activity.Text = respuestaParaUsuario;
+             await context.PostAsync(activity);
+
+             await context.PostAsync("¿En que le podemos ayudar?");
+         }*/
 
 
         private async Task SolicitarEstatusCajero(IDialogContext context, string cajero) {
@@ -913,12 +1053,14 @@ using Newtonsoft.Json;
             if (estatus.Equals(true))
             {
 
-                var cajeros = bd.ObtenerFallaCajero(cajero.ToUpper());
-                if (cajeros != null && cajeros.Count > 0)
+                List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
+                //var cajeros = bd.ObtenerFallaCajero(cajero.ToUpper());
+                //if (cajeros != null && cajeros.Count > 0)
+                if (caj != null && caj.Count > 0)
                 {
-                    Cajero cajeroBean = cajeros[0];
+                   // Cajero cajeroBean = cajeros[0];
                     var activity = context.MakeMessage();
-                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                   /* activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
                         Text = "El cajero " + cajero.ToUpper() + " tiene: "+ cajeroBean.conteo + " falla(s)"
@@ -931,9 +1073,9 @@ using Newtonsoft.Json;
 
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
-                    await context.PostAsync(activity);
+                    await context.PostAsync(activity);*/
 
-                    var tipofalla = String.Empty;
+                  /*  var tipofalla = String.Empty;
                     switch (cajeroBean.tipoFalla) {
                         case "ComunicacionEnergia":
                             tipofalla = "Cajero sin energía";
@@ -956,11 +1098,48 @@ using Newtonsoft.Json;
                         default:
                             tipofalla = "Sin identificar";
                             break;
+                    }*/
+
+                    //await context.PostAsync("Falla: " + tipofalla + ",    Fecha: " + cajeroBean.fecha);
+                   // await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+
+                   // List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
+                    List<object> opt = new List<object>();
+                    var titulo = "El cajero " + cajero.ToUpper() + " tiene: " + caj.Count + " falla(s)";
+                    foreach (Cajero element in caj)
+                    {
+                        var tipofalla2 = String.Empty;
+                        switch (element.tipoFalla)
+                        {
+                            case "ComunicacionEnergia":
+                                tipofalla2 = "Cajero sin energía";
+                                break;
+                            case "ErrorSinEfectivo":
+                                tipofalla2 = "Cajero sin efectivo";
+                                break;
+                            case "ModoSupervisor":
+                                tipofalla2 = "Modo Supervisor";
+                                break;
+                            case "FallaHardware":
+                                tipofalla2 = "Falla en el hardware";
+                                break;
+                            case "ProblemaLocal":
+                                tipofalla2 = "Cajero con problema local";
+                                break;
+                            case "TrxsNoMonetarias":
+                                tipofalla2 = "Transacciones no monetarias";
+                                break;
+                            default:
+                                tipofalla2 = "Sin identificar";
+                                break;
+                        }
+                        var menu = "Falla: " + tipofalla2 + ",    Fecha: " + element.fecha;
+                        opt.Add(menu);
                     }
 
-                    await context.PostAsync("Falla: " + tipofalla + ",    Fecha: " + cajeroBean.fecha);
-
+                    await opcionesAcciones2(context, opt, titulo);
                     await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+
                 }
                 else
                 {
@@ -1016,58 +1195,43 @@ using Newtonsoft.Json;
         {
             IConsultorDB bd = new CajeroDaoImpl();
             var obtienemepresa = bd.ObtenerEmpresas(empresa);
-            //string[] valores1;
             string cadena = String.Empty;
             StringBuilder sb = new StringBuilder();
             if (obtienemepresa.Count > 1)
             {
-                List<Empresa> choices = new List<Empresa>();
-                // valores1 = new string[obtienemepresa.Count];
+               /* List<Empresa> choices = new List<Empresa>();
                 for (int i = 0; i < obtienemepresa.Count; i++)
-                {
-                //  valores1[i] = obtienemepresa[i].empresa;
+                {            
                     choices.Add(new Empresa(obtienemepresa[i].empresa, obtienemepresa[i].id_empresa));
                  }
-
-
-                //List<string> lista = new List<string>();
-                //for (int i = 0; i < obtienemepresa.Count; i++)
-                //{
-                //lista.Add(valores1[i]);
-                //}
 
                 var result = ShowOptions(choices, empresa);
                 var activity = context.MakeMessage();
                 activity.Text = "Se encontro mas de una empresa. Escriba cual desea consultar ";
                 activity.Attachments.Add(result);
                 await context.PostAsync(activity);
-                //context.Wait(ConnectOption);
+                //context.Wait(ConnectOption);*/
 
-                //activity.Attachments = new List<Attachment>();              
-                /*List<CardAction> messageOptions = new List<CardAction>();
-          
-
-                for (int i =0; i< obtienemepresa.Count; i++ ) {
-                    messageOptions.Add(new CardAction
-                    {
-                        Title= obtienemepresa[i].empresa,
-                        Text= obtienemepresa[i].id_empresa
-                    });
-                }
-
-                activity.Attachments.Add(
-                new HeroCard
+                List<object> opt = new List<object>();
+                var titulo = "Se encontro mas de una empresa con ese criterio ";
+                foreach (Empresa element in obtienemepresa)
                 {
-                    Title = "¿A cual empresa te refieres?",
-                    Buttons = messageOptions
-                }.ToAttachment()
-                    );*/
+                    var menu = element.empresa;
+                    opt.Add(menu);
+                }
+                await opcionesAcciones2(context, opt, titulo);
 
-                //foreach (Empresa choice in choices) {
-                //}
-                //activity.Attachments.Add(messageOptions);
-               
-                //await context.PostAsync(activity);
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {                    
+                    Text = "Escriba la opcion + 'empresa' + nombre de la empresa que desea consultar ",                    
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
 
             }
             else
