@@ -25,9 +25,9 @@ using Newtonsoft.Json;
     public class RootDialog : IDialog<object>
     {
         List<string> lista;
-        private const string CajeroOption = "Cajero";
-        private const string EmpresaOption = "Empresa";
-        private const string GrupoOption = "Grupo";
+        private const string CajeroOption = "cajero";
+        private const string EmpresaOption = "empresa";
+        private const string GrupoOption = "grupo";
 
         public static class Program {
             public static string cajero;
@@ -645,10 +645,10 @@ using Newtonsoft.Json;
                            //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                            //Title = "No entendi la solicitud ",
                            Subtitle = "No entendi la solicitud",
-                           Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud + nombre del elemento"
-                          // Images = new List<CardImage> {
-                          // new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
-                          // }
+                           Text = "Utiliza la opcion + 'cajero', 'empresa' o 'grupo' + nombre del elemento",                           
+                           // Images = new List<CardImage> {
+                           // new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
+                           // }
                        }.ToAttachment();
 
                        activity2.Attachments = new List<Attachment>();
@@ -665,7 +665,7 @@ using Newtonsoft.Json;
                                //Subtitle = "Debes especificar un cajero o nombre de la empresa",
                                //Title = "No entendi la solicitud ",
                                Subtitle = "No entendi la solicitud",
-                               Text = "Utiliza la palabra 'cajero' o 'empresa' o 'grupo' dentro de la solicitud + nombre del elemento"
+                               Text = "Utiliza la opcion + 'cajero', 'empresa' o 'grupo' + nombre del elemento"
                                //Images = new List<CardImage> {
                                //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/confusion.jpg" }
                                //}   
@@ -707,10 +707,25 @@ using Newtonsoft.Json;
                            await SolicitarEstatusCajerosEmpresa(context, Program.empresa);
                        }
                        break;
-                case Intensiones.SolicitarEstatusCajerosGrupo:         
+                case Intensiones.SolicitarEstatusCajeroGrupo:         
                         Program.grupo = objetoLuis.Entidades[0].entity;
                         await SolicitarEstatusCajerosGrupo(context, Program.grupo);                    
                         break;
+                case Intensiones.SolicitarHistoricoFallasCajeros:
+                    tiempo = objetoLuis.Entidades[0].entity;
+                    if (objetoLuis.Entidades[0].type.Equals("cajero"))
+                    {
+                        Program.cajero = objetoLuis.Entidades[0].entity;
+                        tiempo = "historico";
+                        await SolicitarHistoricoCajero(context, tiempo, Program.cajero);
+                    }
+                    else
+                    {
+                        Program.cajero = objetoLuis.Entidades[1].entity;
+                        await SolicitarHistoricoCajero(context, tiempo, Program.cajero);
+
+                    }
+                    break;
                 case Intensiones.SolicitarHistoricoFallasCajerosEmpresa:
                        tiempo = objetoLuis.Entidades[0].entity;
                        if (objetoLuis.Entidades[0].type.Equals("empresa"))
@@ -724,20 +739,21 @@ using Newtonsoft.Json;
                            await SolicitarHistoricoCajeroEmpresa(context, tiempo, Program.empresa);
                        }
                        break;
-                   case Intensiones.SolicitarHistoricoFallasCajeros:
-                       tiempo = objetoLuis.Entidades[0].entity;
-                       if (objetoLuis.Entidades[0].type.Equals("cajero")) {
-                           Program.cajero = objetoLuis.Entidades[0].entity;
-                           tiempo = "historico";
-                           await SolicitarHistoricoCajero(context, tiempo, Program.cajero);  
-                       }
-                       else
-                       {
-                           Program.cajero = objetoLuis.Entidades[1].entity;
-                           await SolicitarHistoricoCajero(context, tiempo, Program.cajero);
-
-                       }
-                       break;
+                    case Intensiones.SolicitarHistoricoFallasCajerosGrupo:
+                    tiempo = objetoLuis.Entidades[0].entity;
+                    if (objetoLuis.Entidades[0].type.Equals("grupo"))
+                    {
+                        Program.grupo = objetoLuis.Entidades[1].entity;
+                        tiempo = "historico";
+                        //await SolicitarHistoricoCajero(context, tiempo, Program.empresa);
+                    }
+                    else
+                    {
+                        Program.empresa = objetoLuis.Entidades[1].entity;
+                        //await SolicitarHistoricoCajeroEmpresa(context, tiempo, Program.empresa);
+                    }
+                    break;
+    
                    case Intensiones.solicitarFechaSolucion:
                        tiempo= objetoLuis.Entidades[0].entity;
                        if (objetoLuis.Entidades.Count > 1) {
@@ -746,10 +762,41 @@ using Newtonsoft.Json;
                        await SolicitarFechaSolucion(context, Program.cajero, tiempo);
                        break;
                    case Intensiones.SolicitarResponsableCajero:
-                       Program.cajero = objetoLuis.Entidades[0].entity;                    
+                    if (objetoLuis.Entidades[0].GetType().Equals("responsable")) {
+                        Program.cajero = objetoLuis.Entidades[1].entity;
+                    }
+                    else
+                    {
+                        Program.cajero = objetoLuis.Entidades[0].entity;
+                    }
+                       //Program.cajero = objetoLuis.Entidades[1].entity;                    
                        await SolicitarResponsable(context, Program.cajero);
                        break;
-                   default:
+                    case Intensiones.SolicitarResponsableCajeroEmpresa:
+                        if (objetoLuis.Entidades[0].GetType().Equals("responsable"))
+                        {
+                            Program.empresa = objetoLuis.Entidades[1].entity;
+                        }
+                        else
+                        {
+                            Program.empresa = objetoLuis.Entidades[0].entity;
+                        }
+                    //Program.empresa = objetoLuis.Entidades[1].entity;
+                    await SolicitarResponsableEmpresa(context, Program.empresa);
+                        break;
+                    case Intensiones.SolicitarResponsableCajeroGrupo:
+                        if (objetoLuis.Entidades[0].GetType().Equals("responsable"))
+                        {
+                            Program.grupo = objetoLuis.Entidades[1].entity;
+                        }
+                        else
+                        {
+                            Program.grupo = objetoLuis.Entidades[0].entity;
+                        }
+                    //Program.grupo = objetoLuis.Entidades[1].entity;
+                    await SolicitarResponsableGrupo(context, Program.grupo);
+                        break;
+                default:
                        await context.PostAsync(intension.ToString());
                        context.Wait(MessageReceivedAsync);
                        break;
@@ -1599,8 +1646,6 @@ using Newtonsoft.Json;
             var historico = bd.obtenerHistoricoCajero(cajero.ToUpper(), periodo);
             if (historico != null && historico.Count > 0)
             {
-                //Cajero cajeroBean = historico[0];
-
                 var activity = context.MakeMessage();
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 var menuHeroCard = new ThumbnailCard
@@ -1661,8 +1706,6 @@ using Newtonsoft.Json;
                     await context.PostAsync("Falla: " + tipofalla + ",  Folio: " + folio+", Fecha: "+cajeroBean.fecha);
 
                 }
-
-
 
                 await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?"); 
             }
@@ -1896,8 +1939,8 @@ using Newtonsoft.Json;
                 var menuHeroCard = new ThumbnailCard
                 {
                     //Subtitle = cajeroBean.conteo + " falla(s)",
-                    Title = "El responsable del cajero " + cajero.ToUpper() + " es: ",
-                    Subtitle = resp
+                    //Title = "El responsable del cajero " + cajero.ToUpper() + " es: ",
+                    Text = "El responsable del cajero " + cajero.ToUpper() + " es: "+resp
                     //Images = new List<CardImage> {
                     //    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/solucion.jpg" }
                     //}
@@ -1907,7 +1950,17 @@ using Newtonsoft.Json;
                 activity.Attachments.Add(menuHeroCard);
                 await context.PostAsync(activity);
 
-                await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+               // await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+             
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard2 = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",            
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard2);
+                await context.PostAsync(activity);
 
 
             }
@@ -1919,10 +1972,130 @@ using Newtonsoft.Json;
                 {
                     Text = "Algo más en que le podamos ayudar?",
                     //Subtitle = "Verifique e",
-                    Title = "No es posible identificar ese cajero"
+                    Subtitle = "No es posible identificar ese cajero"
                     //Images = new List<CardImage> {
                      //   new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
                     //}
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
+            }
+
+        }
+
+        private async Task SolicitarResponsableEmpresa(IDialogContext context, string empresa)
+        {
+            IConsultorDB bd = new CajeroDaoImpl();
+            var responsable = bd.obtenerResponsableEmpresa(empresa.ToUpper());
+            if (responsable != null && responsable.Count > 0)
+            {
+                Empresa cajeroBean = responsable[0];
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                string resp = string.Empty;
+                if (cajeroBean.responsable.Equals(""))
+                {
+                    resp = "No hay datos del responsable";
+
+                }
+                else
+                {
+                    resp = cajeroBean.responsable;
+                }
+
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "El responsable del cajero " + empresa.ToUpper() + " es: " + resp
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
+                //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard2 = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard2);
+                await context.PostAsync(activity);
+
+
+            }
+            else
+            {
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                    Subtitle = "No es posible identificar la empresa"
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+
+            }
+
+        }
+
+
+        private async Task SolicitarResponsableGrupo(IDialogContext context, string grupo)
+        {
+            IConsultorDB bd = new CajeroDaoImpl();
+            var responsable = bd.obtenerResponsableGrupo(grupo.ToUpper());
+            if (responsable != null && responsable.Count > 0)
+            {
+                Grupo cajeroBean = responsable[0];
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                string resp = string.Empty;
+                if (cajeroBean.responsable.Equals(""))
+                {
+                    resp = "No hay datos del responsable";
+
+                }
+                else
+                {
+                    resp = cajeroBean.responsable;
+                }
+
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "El responsable del cajero " + grupo.ToUpper() + " es: " + resp
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+                //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");         
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard2 = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                }.ToAttachment();
+
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard2);
+                await context.PostAsync(activity);
+            }
+            else
+            {
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var menuHeroCard = new ThumbnailCard
+                {
+                    Text = "Algo más en que le podamos ayudar?",
+                    Subtitle = "No es posible identificar el grupo"
                 }.ToAttachment();
 
                 activity.Attachments = new List<Attachment>();

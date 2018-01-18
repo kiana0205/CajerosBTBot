@@ -39,5 +39,7 @@ namespace CajerosBTBot.Bean
         public string Empresas { get; set; }
 
         public string Mensaje { get; set; }
+
+        public string responsable { get; set; }
     }
 }

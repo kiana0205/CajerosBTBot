@@ -776,6 +776,104 @@ namespace CajerosBTBot.implementaciones
             return cajeros;
         }
 
+        public List<Empresa> obtenerResponsableEmpresa(string empresa)
+        {
+            List<Empresa> cajeros = new List<Empresa>();
+            try
+            {
+
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  id_producto as cajero,  ");
+                    sb.Append(" responsable, e.empresa from falla_f_fallas_diaria   f ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    sb.Append(" where id_tipo_producto = 2  and e.empresa like '%' +replace('" + empresa + "',' ','_')+' %'");
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Empresa cajeroBean = new Empresa();
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.responsable = myReader["responsable"].ToString();
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
+        }
+
+        public List<Grupo> obtenerResponsableGrupo(string grupo)
+        {
+            List<Grupo> cajeros = new List<Grupo>();
+            try
+            {
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                //using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    Console.WriteLine("\nQuery data example:");
+                    Console.WriteLine("=========================================\n");
+                    connection.Open();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select  id_producto as cajero,  ");
+                    sb.Append(" responsable, e.grupo from falla_f_fallas_diaria   f ");
+                    sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    sb.Append(" where id_tipo_producto = 2  and e.empresa like '%' +replace('" + grupo + "',' ','_')+' %'");
+
+                    String sql = sb.ToString();
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Grupo cajeroBean = new Grupo();
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.responsable = myReader["responsable"].ToString();
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
+        }
 
 
         /*   public List<Cajero> obtenerFallaCajerosEmpresa(string empresa)

@@ -102,7 +102,7 @@ namespace CajerosBTBot.implementaciones
                 case "SolicitarEstatusCajerosEmpresa":
                     return Intensiones.SolicitarEstatusCajerosEmpresa;
                 case "SolicitarEstatusCajeroGrupo":
-                    return Intensiones.SolicitarEstatusCajerosGrupo;
+                    return Intensiones.SolicitarEstatusCajeroGrupo;
                 //case "SolicitarFallasCajerosEmpresa":
                 //    return Intensiones.SolicitarFallasCajerosEmpresa;
                 case "SolicitarHistoricoFallasCajerosEmpresa":
@@ -113,6 +113,10 @@ namespace CajerosBTBot.implementaciones
                     return Intensiones.solicitarFechaSolucion;
                 case "SolicitarResponsableCajero":
                     return Intensiones.SolicitarResponsableCajero;
+                case "SolicitarResponsableCajeroEmpresa":
+                    return Intensiones.SolicitarResponsableCajeroEmpresa;
+                case "SolicitarResponsableCajeroGrupo":
+                    return Intensiones.SolicitarResponsableCajeroGrupo;
                 case "Saludo":
                     return Intensiones.Saludo;
                 case "Ayuda":

@@ -32,5 +32,9 @@ namespace CajerosBTBot.Interfaces
         List<Tiempo> obtenerPeriodoSolucion(string cajero);
 
         List<Cajero> obtenerResponsable(string cajero);
+
+        List<Empresa> obtenerResponsableEmpresa(string empresa);
+
+        List<Grupo> obtenerResponsableGrupo(string grupo);
     }
 }
