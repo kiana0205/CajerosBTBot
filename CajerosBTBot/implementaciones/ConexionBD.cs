@@ -369,6 +369,75 @@ namespace CajerosBTBot.implementaciones
         }
 
 
+        public Int32 obtenerConteoCajerosEmpresa(string empresa)
+        {
+            Int32 count = 0;
+            try
+            {
+                
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    connection.Open();
+
+                    var emp = String.Empty;
+   
+                    StringBuilder cn = new StringBuilder();
+                    cn.Append(" select count(*) from falla_f_fallas_diaria f ");
+                    cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    cn.Append(" where f.id_tipo_producto = 2");
+                    cn.Append(" and e.empresa like  '%" + empresa + "%'");    
+                    String res = cn.ToString();
+                    SqlCommand comm = new SqlCommand(res, connection);
+                    count = (Int32)comm.ExecuteScalar();
+     
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return count;
+        }
+
+
+        public Int32 obtenerConteoCajerosGrupo(string grupo)
+        {
+            Int32 count = 0;
+            try
+            {
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    connection.Open();
+
+                    var emp = String.Empty;
+
+                    StringBuilder cn = new StringBuilder();
+                    cn.Append(" select count(*) from falla_f_fallas_diaria f ");
+                    cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto ");
+                    cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
+                    cn.Append(" where f.id_tipo_producto = 2");
+                    cn.Append(" and e.grupo like  '%" + grupo + "%'");
+                    String res = cn.ToString();
+                    SqlCommand comm = new SqlCommand(res, connection);
+                    count = (Int32)comm.ExecuteScalar();
+
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return count;
+        }
+
         public Boolean obtenerEstatusCajerosGrupo(string grupo)
         {
             Boolean est = false;

@@ -36,5 +36,9 @@ namespace CajerosBTBot.Interfaces
         List<Empresa> obtenerResponsableEmpresa(string empresa);
 
         List<Grupo> obtenerResponsableGrupo(string grupo);
+
+        Int32 obtenerConteoCajerosGrupo(string grupo);
+
+        Int32 obtenerConteoCajerosEmpresa(string empresa);
     }
 }
