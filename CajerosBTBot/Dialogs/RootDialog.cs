@@ -679,6 +679,7 @@ using Newtonsoft.Json;
                     //await ManejarSaludo(context);
                     if (!Program.grupo.Equals(""))
                     {
+                        
                         await SolicitarEstatusCajerosEmpresa(context, Program.grupo);
                     }
                     else {
@@ -952,12 +953,6 @@ using Newtonsoft.Json;
 
         private async Task OnOptionSelected3(IDialogContext context, IAwaitable<string> result)
         {
-
-            /*var confirm = await result;
-            if (confirm)
-                await SolicitarEstatusCajerosEmpresa(context, Program.grupo);
-                else
-                    context.Wait(MessageReceivedAsync);*/
             var confirm = await result;
             context.Done(confirm);
 
@@ -993,9 +988,9 @@ using Newtonsoft.Json;
                                                           new TextBlock(){
                                                               Text ="Estatus "
                                                           },
-                                                          new TextBlock(){
-                                                              Text ="Responsable "
-                                                          },
+                                                       //   new TextBlock(){
+                                                       //       Text ="Responsable "
+                                                       //   },
                                                           new TextBlock(){
                                                               Text = "Historico "
                                                           },
@@ -1261,6 +1256,9 @@ using Newtonsoft.Json;
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
                     await context.PostAsync(activity);
+                    await context.PostAsync("Si necesita ver las opciones escriba ayuda");
+
+
 
                 }
                 else
@@ -1270,7 +1268,7 @@ using Newtonsoft.Json;
                     var menuHeroCard = new ThumbnailCard
                     {
                         Text = "Algo más en que le podamos ayudar?",
-                        Subtitle = "No existen fallas en el cajero " + cajero.ToUpper(),
+                        Subtitle = "El cajero " + cajero.ToUpper()+" no tiene fallas",
                         //Subtitle = "Verifique el número de cajero",
                         //Title = "No existen fallas en el cajero " + cajero.ToUpper() + "o no pertenece a banca transaccional",
                         //Images = new List<CardImage> {
@@ -1295,7 +1293,7 @@ using Newtonsoft.Json;
                     Text = "Algo más en que le podamos ayudar?",
                     //Subtitle = "Verifique el número de cajero",
                     //Title = "No existen fallas en el cajero "+ cajero.ToUpper()+" o no pertenece a banca transaccional",
-                    Subtitle = "No existen fallas en el cajero " + cajero.ToUpper() 
+                    Subtitle = "El cajero " + cajero.ToUpper()+" no tiene fallas" 
                     //Images = new List<CardImage> {
                     //    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
                     //}
@@ -1333,10 +1331,11 @@ using Newtonsoft.Json;
                  await context.PostAsync(activity);
                  //context.Wait(ConnectOption);*/
                 List<object> opt = new List<object>();
-                var titulo = "Se encontro mas de una empresa con ese criterio ";
+                var titulo = "Hay mas de una empresa con "+empresa.ToUpper();
                 foreach (Empresa element in obtienemepresa)
                 {
-                    var menu = element.empresa;
+                    int tam = empresa.Length;
+                    var menu = element.empresa.Substring(tam);
                     opt.Add(menu);
                 }
                 await opcionesAcciones2(context, opt, titulo);
@@ -1345,7 +1344,7 @@ using Newtonsoft.Json;
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Escriba la opcion + 'empresa' + nombre de la empresa que desea consultar ",
+                    Text = "Escriba  la opcion  + 'empresa' + nombre de la empresa que desea consultar ",
                 }.ToAttachment();
 
                 activity.Attachments = new List<Attachment>();
@@ -1422,7 +1421,7 @@ using Newtonsoft.Json;
 
 
                                 List<object> opt = new List<object>();
-                                var titulo = "La empresa tiene las siguientes fallas: ";
+                                var titulo = "Fallas de la empresa "+Program.empresa;
                                 foreach (Empresa element in empresas)
                                 {
                                     var tipofalla2 = String.Empty;
@@ -1450,7 +1449,7 @@ using Newtonsoft.Json;
                                             tipofalla2 = "Sin identificar";
                                             break;
                                     }
-                                    var menu = element.cajero + "   " + tipofalla2 + "  Folio:" + element.folio;
+                                    var menu = element.cajero + "   " + tipofalla2 + "  " + element.folio;
                                     opt.Add(menu);
                                 }
 
@@ -1647,7 +1646,7 @@ using Newtonsoft.Json;
 
                               await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
                             List<object> opt = new List<object>();
-                            var titulo = "El grupo tiene las siguientes fallas: ";
+                            var titulo = "Se encontraron las siguientes fallas en el grupo "+Program.grupo;
                             foreach (Grupo element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1675,7 +1674,7 @@ using Newtonsoft.Json;
                                         tipofalla2 = "Sin identificar";
                                         break;
                                 }
-                                var menu = element.cajero + "   " + tipofalla2 + "  Folio:" + element.folio;
+                                var menu = element.empresa+"    "+element.cajero + "   " + tipofalla2 + "   " + element.folio;
                                 opt.Add(menu);
                             }
 
