@@ -217,6 +217,94 @@ namespace CajerosBTBot.implementaciones
         }
 
 
+        public List<Grupo> obtenerHistoricoCajeroGrupo(string grupo, string periodo)
+        {
+            List<Grupo> cajeros = new List<Grupo>();
+            try
+            {
+
+
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                // using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    connection.Open();
+                    StringBuilder cn = new StringBuilder();
+                    switch (periodo)
+                    {
+                        case "TOP 5":
+                            cn.Append(" SELECT TOP 5a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha_inicio as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and e.grupo like'%" + grupo + "%'");
+                            cn.Append(" order by fecha_inicio desc ");
+                            break;
+
+                        case "MONTH":
+                            cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                            cn.Append(" from falla_f_fallas_diaria f");
+                            cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                            cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                            cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                            cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                            cn.Append(" where f.id_tipo_producto = 2");
+                            cn.Append(" and e.grupo like'%" + grupo + "%'");
+                            cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
+                            cn.Append(" order by fecha desc ");
+                            break;
+                        default:
+                            {
+                                cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
+                                cn.Append(" from falla_f_fallas_diaria f");
+                                cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
+                                cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
+                                cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
+                                cn.Append(" left join falla_d_fallas d on d.id_falla = f.id_falla");
+                                cn.Append(" where f.id_tipo_producto = 2");
+                                cn.Append(" and e.grupo like'%" + grupo + "%'");
+                                cn.Append(" and datepart(mm, f.fecha)= datepart(mm, getdate()) ");
+                                cn.Append(" order by fecha desc ");
+                                break;
+                            }
+                    }
+                    String sql = cn.ToString();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataReader myReader = null;
+                        myReader = command.ExecuteReader();
+
+                        while (myReader.Read())
+                        {
+                            Grupo cajeroBean = new Grupo();
+
+                            cajeroBean.cajero = myReader["cajero"].ToString();
+                            cajeroBean.fecha = myReader["fecha"].ToString();
+                            cajeroBean.empresa = myReader["empresa"].ToString();
+                            //cajeroBean.conteo = myReader["conteo"].ToString();                            
+                            cajeroBean.tipoFalla = myReader["tipofalla"].ToString();
+                            cajeroBean.folio = myReader["folio"].ToString();
+
+                            cajeros.Add(cajeroBean);
+                        }
+
+                    }
+
+                }
+
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            return cajeros;
+        }
+
         public List<Cajero> obtenerHistoricoCajero(string cajero, string periodo)
         {
             List<Cajero> cajeros = new List<Cajero>();

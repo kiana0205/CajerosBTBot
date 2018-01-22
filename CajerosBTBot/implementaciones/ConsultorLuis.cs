@@ -21,6 +21,8 @@ namespace CajerosBTBot.implementaciones
         public static class Program
         {
             public static string cajero;
+            public static string empresa;
+            public static string grupo;
         }
 
         private const string UrlServicioLuis = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/ea11a124-10ea-4977-bb9a-b76bdc58ddb2?subscription-key=22cbe58ef25b47e3a08e4f472d774359&timezoneOffset=0&verbose=false&q=";
@@ -46,12 +48,29 @@ namespace CajerosBTBot.implementaciones
                 var resultadoAnalisisTexto = javaScriptSerializer.Deserialize<ResultadoLuis>(contenidoRespuesta);
 
 
-                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajero") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosEmpresa") | resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosGrupo"))
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajero")  )
                 {
                     EntityLuis ent = new EntityLuis();
-                    ent.entity ="desconocido";
+                    ent.entity =Program.cajero;
                     ent.score = 0.9;
-                    ent.type = "desconocido";
+                    ent.type = "cajero";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
+
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosEmpresa"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.empresa;
+                    ent.score = 0.9;
+                    ent.type = "empresa";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
+                if (resultadoAnalisisTexto.entities.Count == 0 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarEstatusCajerosGrupo"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.grupo;
+                    ent.score = 0.9;
+                    ent.type = "grupo";
                     resultadoAnalisisTexto.entities.Add(ent);
                 }
 
@@ -73,10 +92,27 @@ namespace CajerosBTBot.implementaciones
                             ent.type = resultadoAnalisisTexto.query;
 
                     }
-                    //EntityLuis ent = new EntityLuis();
-                    //ent.entity = "noidentifico";
-                    //ent.score = 0.9;
-                    //ent.type = "noidentifico";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
+
+                if (resultadoAnalisisTexto.entities.Count == 1 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarHistoricoFallasCajeros") && resultadoAnalisisTexto.entities[0].type.Equals("tiempo")) {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.cajero;
+                    ent.type = "cajero";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
+                if (resultadoAnalisisTexto.entities.Count == 1 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarHistoricoFallasCajerosEmpresa") && resultadoAnalisisTexto.entities[0].type.Equals("tiempo"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.empresa;
+                    ent.type = "empresa";
+                    resultadoAnalisisTexto.entities.Add(ent);
+                }
+                if (resultadoAnalisisTexto.entities.Count == 1 && resultadoAnalisisTexto.topScoringIntent.intent.Equals("SolicitarHistoricoFallasCajerosGrupo") && resultadoAnalisisTexto.entities[0].type.Equals("tiempo"))
+                {
+                    EntityLuis ent = new EntityLuis();
+                    ent.entity = Program.grupo;
+                    ent.type = "grupo";
                     resultadoAnalisisTexto.entities.Add(ent);
                 }
 
@@ -97,17 +133,42 @@ namespace CajerosBTBot.implementaciones
                 case "None":
                     return Intensiones.None;
                 case "SolicitarEstatusCajero":
-                    Program.cajero = objetosLuis.Entidades[0].entity;
-                    return Intensiones.SolicitarEstatusCajero;
+                        Program.cajero = objetosLuis.Entidades[0].entity;                
+                        return Intensiones.SolicitarEstatusCajero;
                 case "SolicitarEstatusCajerosEmpresa":
-                    return Intensiones.SolicitarEstatusCajerosEmpresa;
+                        Program.empresa = objetosLuis.Entidades[0].entity;
+                        return Intensiones.SolicitarEstatusCajerosEmpresa;
                 case "SolicitarEstatusCajeroGrupo":
-                    return Intensiones.SolicitarEstatusCajeroGrupo;
-                //case "SolicitarFallasCajerosEmpresa":
-                //    return Intensiones.SolicitarFallasCajerosEmpresa;
+                        Program.grupo = objetosLuis.Entidades[0].entity;
+                        return Intensiones.SolicitarEstatusCajeroGrupo;
                 case "SolicitarHistoricoFallasCajerosEmpresa":
-                    return Intensiones.SolicitarHistoricoFallasCajerosEmpresa;                
+                    if (objetosLuis.Entidades[0].type.Equals("tiempo"))
+                    {
+                        Program.empresa = objetosLuis.Entidades[1].entity;
+                    }
+                    else
+                    {
+                        Program.empresa = objetosLuis.Entidades[0].entity;
+                    }
+                        return Intensiones.SolicitarHistoricoFallasCajerosEmpresa;
+                case "SolicitarHistoricoFallasCajerosGrupo":
+                    if (objetosLuis.Entidades[0].type.Equals("tiempo"))
+                    {
+                        Program.grupo = objetosLuis.Entidades[1].entity;
+                    }
+                    else
+                    {
+                        Program.grupo = objetosLuis.Entidades[0].entity;
+                    }
+                        return Intensiones.SolicitarHistoricoFallasCajerosGrupo;
                 case "SolicitarHistoricoFallasCajeros":
+                    if (objetosLuis.Entidades[0].type.Equals("tiempo"))
+                    {
+                        Program.cajero = objetosLuis.Entidades[1].entity;
+                    }
+                    else {
+                        Program.cajero = objetosLuis.Entidades[0].entity;
+                    }                  
                     return Intensiones.SolicitarHistoricoFallasCajeros;
                 case "solicitarFechaSolucion":
                     return Intensiones.solicitarFechaSolucion;

@@ -25,6 +25,8 @@ namespace CajerosBTBot.Interfaces
 
         List<Cajero> obtenerHistoricoCajero(string cajero, string periodo);
 
+        List<Grupo> obtenerHistoricoCajeroGrupo(string grupo, string periodo);
+
         List<Empresa> ObtenerEmpresas(string empresa);
 
         List<Grupo> ObtenerGrupos(string empresa);
