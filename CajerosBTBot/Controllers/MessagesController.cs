@@ -80,7 +80,7 @@ using System.Web;
                 }
                 else
                 {
-                    //HandleSystemMessage(activity);
+                     HandleSystemMessage(activity);
                     
                 }
             }
@@ -177,9 +177,21 @@ using System.Web;
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                // Handle conversation state changes, like members being added and removed
-                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-                // Not available in all channels
+                IConversationUpdateActivity update = message;
+                var Client = new ConnectorClient(new Uri(message.ServiceUrl), new MicrosoftAppCredentials());
+                if (update.MembersAdded != null && update.MembersAdded.Any()) {
+                    foreach (var newMember in update.MembersAdded) {
+                        if (newMember.Id != message.Recipient.Id) {
+                            var reply = message.CreateReply();
+                            reply.Text = $"Bienvenido al Chat de fallas en cajero. hola!";
+                            Client.Conversations.ReplyToActivityAsync(reply);
+                        }
+                    }
+                }
+                //ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                //Activity reply = message.CreateReply("Bienvenido al chat de fallas en cajeros. Hola!");
+                //connector.Conversations.ReplyToActivityAsync(reply);
+           
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {
@@ -193,7 +205,6 @@ using System.Web;
             else if (message.Type == ActivityTypes.Ping)
             {
             }
-
             return null;
         }
     }

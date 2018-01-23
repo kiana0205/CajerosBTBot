@@ -899,7 +899,7 @@ using Newtonsoft.Json;
              reply.Attachments.Add(result);
              await context.PostAsync(reply);
              context.Wait(MessageReceivedAsync);*/
-            PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "Bienvenido. Quieres consultar por?", "Opcion no valida", 4,PromptStyle.Auto);
+            PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "Quieres consultar fallas por?", "Opcion no valida", 4,PromptStyle.Auto);
 
         }
 
