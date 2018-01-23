@@ -727,22 +727,30 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
 
                     var emp = String.Empty;
-                   /* if (empresa.Length > 35)
-                    {
-                        emp = empresa.Substring(0, 35);
-                    }
-                    else
-                    {
-                        emp = empresa;
-                    }*/
+                    /* if (empresa.Length > 35)
+                     {
+                         emp = empresa.Substring(0, 35);
+                     }
+                     else
+                     {
+                         emp = empresa;
+                     }*/
 
-                    StringBuilder sb = new StringBuilder();
+                    /*StringBuilder sb = new StringBuilder();
                     sb.Append(" select  e.id_empresa, e.empresa from falla_f_fallas_diaria f ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto  ");
                     sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");                 
                     sb.Append(" where f.id_tipo_producto = 2  and e.empresa like '%" + empresa + "%'");
                     sb.Append(" group by e.id_empresa, e.empresa");
-                    sb.Append(" order by e.empresa desc");
+                    sb.Append(" order by e.empresa desc");*/
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select distinct(e.empresa), e.empresa, e.id_empresa from atm_d_cajero a ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");
+                    sb.Append(" where a.tipo_producto = 2  ");
+                    sb.Append(" and e.empresa like '%'+replace('" + empresa + "',' ','_') +'%'");
+                   
+
 
                     String sql = sb.ToString();
 
@@ -789,14 +797,20 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
 
                     var emp = String.Empty;
-      
-                    StringBuilder sb = new StringBuilder();
+
+                    /*StringBuilder sb = new StringBuilder();
                     sb.Append(" select  e.id_grupo, e.grupo from falla_f_fallas_diaria f ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto  ");
                     sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");
                     sb.Append(" where f.id_tipo_producto = 2  and e.grupo like '%" + grupo + "%'");
                     sb.Append(" group by e.id_grupo, e.grupo");
-                    sb.Append(" order by e.grupo desc");
+                    sb.Append(" order by e.grupo desc");*/
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" select distinct(e.grupo), e.grupo, e.id_grupo from atm_d_cajero a ");
+                    sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa  ");
+                    sb.Append(" where a.tipo_producto = 2  ");
+                    sb.Append(" and e.grupo like '%'+replace('" + grupo + "',' ','_') +'%'");
 
                     String sql = sb.ToString();
 

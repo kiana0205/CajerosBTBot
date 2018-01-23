@@ -1297,7 +1297,7 @@ using Newtonsoft.Json;
         {
             IConsultorDB bd = new CajeroDaoImpl();
             var obtienemepresa = bd.ObtenerEmpresas(empresa);
-            string cadena = String.Empty;
+            //string cadena = String.Empty;
             StringBuilder sb = new StringBuilder();
             if (obtienemepresa.Count > 1)
             {
@@ -1316,8 +1316,12 @@ using Newtonsoft.Json;
                 var titulo = "Hay mas de una empresa con "+empresa.ToUpper();
                 foreach (Empresa element in obtienemepresa)
                 {
-                    int tam = empresa.Length;
-                    var menu = element.empresa.Substring(tam);
+                    Int32 tam = empresa.Length;
+                    string nombre = null;
+                    if (tam >= 40) { nombre = element.empresa.Substring(0, tam - 15); }
+                    else if (tam >= 30 && tam < 40) { nombre = element.empresa.Substring(0, tam - 8); } else { nombre = element.empresa; }
+                    //var menu = element.empresa.Substring(tam);
+                    var menu = nombre;
                     opt.Add(menu);
                 }
                 await opcionesAcciones2(context, opt, titulo);
@@ -1336,12 +1340,12 @@ using Newtonsoft.Json;
             else
             {
                 Program.empresa = obtienemepresa[0].empresa;              
-                var conteo = bd.obtenerConteoCajerosEmpresa(empresa.ToUpper());
+                var conteo = bd.obtenerConteoCajerosEmpresa(Program.empresa.ToUpper());
                 if (conteo >= 1) { 
-                        var estatus = bd.obtenerEstatusCajerosEmpresa(empresa.ToUpper());
+                        var estatus = bd.obtenerEstatusCajerosEmpresa(Program.empresa.ToUpper());
                         if (estatus.Equals(true))
                         {
-                            var empresas = bd.ObtenerFallasEmpresa(empresa.ToUpper());
+                            var empresas = bd.ObtenerFallasEmpresa(Program.empresa.ToUpper());
                             if (empresas != null && empresas.Count > 0)
                             {                               
                                 var activity = context.MakeMessage();
@@ -1402,10 +1406,15 @@ using Newtonsoft.Json;
                                  await context.PostAsync("Cajero: " + cajeroBean.cajero + ",  Falla: " + tipofalla + ",  Folio: " + folio);
                              }*/
 
-                            Program.empresa = empresas[0].empresa;
+                            //Program.empresa = empresas[0].empresa;
                             List<object> opt = new List<object>();
+                            Int32 tam = Program.empresa.Length;
+                            string nombre = null;
+                            if (tam > 40) { nombre = Program.empresa.Substring(0, tam - 15); }
+                            else if (tam >= 30 && tam < 40) { nombre = Program.empresa.Substring(0, tam - 8); } else { nombre = Program.empresa; }
+                            
 
-                                var titulo = Program.empresa+" tiene fallas: ";
+                                var titulo = nombre +" tiene fallas: ";
                                 foreach (Empresa element in empresas)
                                 {
                                     var tipofalla2 = String.Empty;
@@ -1537,10 +1546,15 @@ using Newtonsoft.Json;
                 activity.Attachments.Add(result);
                 await context.PostAsync(activity);*/
                 List<object> opt = new List<object>();
-                var titulo = "Se encontro mas de un grupo con ese criterio ";
+                var titulo = "Hay mas de un grupo con  "+grupo.ToUpper();
                 foreach (Grupo element in obtienemepresa)
                 {
-                    var menu = element.grupo;
+                    Int32 tam = grupo.Length;
+                    string nombre = null;
+                    if (tam >= 40) { nombre = element.grupo.Substring(0, tam - 15); }
+                    else if (tam >= 30 && tam < 40) { nombre = element.grupo.Substring(0, tam - 8); } else { nombre = element.grupo; }
+                    var menu = nombre;
+                    //var menu = element.grupo;
                     opt.Add(menu);
                 }
                 await opcionesAcciones2(context, opt, titulo);
@@ -1560,11 +1574,11 @@ using Newtonsoft.Json;
             else
             {
                 if (obtienemepresa.Count == 1) {
-                    
-                var estatus = bd.obtenerEstatusCajerosGrupo(grupo.ToUpper());
+                    Program.grupo = obtienemepresa[0].grupo;
+                var estatus = bd.obtenerEstatusCajerosGrupo(Program.grupo.ToUpper());
                     if (estatus.Equals(true))
                     {
-                        var empresas = bd.ObtenerFallasGrupo(grupo.ToUpper());
+                        var empresas = bd.ObtenerFallasGrupo(Program.grupo.ToUpper());
                         if (empresas != null && empresas.Count > 0)
                         {
 
@@ -1629,9 +1643,15 @@ using Newtonsoft.Json;
                               }
 
                               await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
-                            Program.grupo = empresas[0].grupo;
+                           // Program.grupo = empresas[0].grupo;
                             List<object> opt = new List<object>();
-                            var titulo = "Se encontraron las siguientes fallas en el grupo "+Program.grupo;
+
+                            Int32 tam = Program.grupo.Length;
+                            string nombre = null;
+                            if (tam >= 40) { nombre = Program.grupo.Substring(0, tam - 15); }
+                            else if (tam >= 30 && tam < 40) { nombre = Program.grupo.Substring(0, tam - 8); } else { nombre = Program.grupo; }
+
+                            var titulo = "Fallas en el grupo "+nombre;
                             foreach (Grupo element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1659,7 +1679,15 @@ using Newtonsoft.Json;
                                         tipofalla2 = "Sin identificar";
                                         break;
                                 }
-                                var menu = element.empresa+"    "+element.cajero + "   " + tipofalla2 + "   " + element.folio;
+
+                                Int32 tam2 = element.empresa.Length;
+                                string nombre2 = null;
+                                if (tam >= 30) { nombre2 = element.empresa.Substring(0, tam - 15); }
+                                else if (tam >= 20 && tam < 30) { nombre2 = element.empresa.Substring(0, tam - 8); } else { nombre2 = element.empresa; }
+
+
+                                //var menu = nombre2.ToLower()+","+element.cajero + "," + tipofalla2 + "," + element.folio;
+                                var menu = nombre2.ToLower() + "," + element.cajero + "," + tipofalla2;
                                 opt.Add(menu);
                             }
 
