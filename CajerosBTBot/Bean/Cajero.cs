@@ -18,5 +18,7 @@ namespace CajerosBTBot.Bean
 
         public string responsable { get; set; }
 
+        public string fechasolucion { get; set; }
+
     }
 }

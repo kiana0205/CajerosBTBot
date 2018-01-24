@@ -183,7 +183,7 @@ using System.Web;
                     foreach (var newMember in update.MembersAdded) {
                         if (newMember.Id != message.Recipient.Id) {
                             var reply = message.CreateReply();
-                            reply.Text = $"Bienvenido al Chat de fallas en cajero. hola!";
+                            reply.Text = $"Bienvenido al Chat de fallas de cajeros";
                             Client.Conversations.ReplyToActivityAsync(reply);
                         }
                     }

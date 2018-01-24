@@ -77,13 +77,13 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
                       
                         StringBuilder sb = new StringBuilder();
-                        sb.Append("SELECT d.id_producto as cajero, d.fecha_inicio as fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo ");
+                        sb.Append("SELECT d.id_producto as cajero, d.fecha_inicio as fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo, d.responsable, d.fecha_estimada_solucion as fechasolucion ");
                         sb.Append("FROM falla_f_fallas_diaria d");
                         sb.Append(" join falla_d_fallas f ");
                         sb.Append(" on f.id_falla = d.id_falla");
                         sb.Append(" where d.id_producto='" + cajero + "'");
                         sb.Append(" and d.id_tipo_producto = 2");
-                        sb.Append(" group by d.id_producto, d.fecha_inicio, f.tipo_falla, d.folio");
+                        sb.Append(" group by d.id_producto, d.fecha_inicio, f.tipo_falla, d.folio, d.responsable, d.fecha_estimada_solucion");
                         // sb.Append("JOIN [SalesLT].[Product] p ");
                         //sb.Append("ON pc.productcategoryid = p.productcategoryid;");
                         String sql = sb.ToString();
@@ -103,8 +103,10 @@ namespace CajerosBTBot.implementaciones
                                 cajeroBean.conteo = myReader["conteo"].ToString();
                                 cajeroBean.tipoFalla = myReader["falla"].ToString();
                                 cajeroBean.folio = myReader["folio"].ToString();
+                                cajeroBean.responsable= myReader["responsable"].ToString();
+                                cajeroBean.fechasolucion= myReader["fechasolucion"].ToString();
 
-                                cajeros.Add(cajeroBean);
+                            cajeros.Add(cajeroBean);
                             }
 
                         }
@@ -171,7 +173,7 @@ namespace CajerosBTBot.implementaciones
                         default:
                             {
                                 cn.Append(" SELECT a.id_cajero as cajero, s.tipo_falla as tipofalla, e.empresa, f.folio, f.fecha as fecha ");
-                                cn.Append(" from falla_f_fallas_diaria f");
+                                cn.Append(" from falla_f_fallas_diaria2 f");
                                 cn.Append(" left join falla_d_fallas s on s.id_falla =f.id_falla");
                                 cn.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
                                 cn.Append(" left join cat_d_empresa_grupo e on e.id_empresa=a.id_empresa");
