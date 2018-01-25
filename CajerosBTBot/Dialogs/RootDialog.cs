@@ -1547,7 +1547,7 @@ using Newtonsoft.Json;
                             else if (tam >= 30 && tam < 40) { nombre = Program.empresa.Substring(0, tam - 8); } else { nombre = Program.empresa; }
                             
 
-                                var titulo = nombre +" tiene fallas: ";
+                                var titulo = nombre +" tiene "+empresas.Count+" cajeros con fallas: ";
                                 foreach (Empresa element in empresas)
                                 {
                                     var tipofalla2 = String.Empty;
@@ -1653,9 +1653,16 @@ using Newtonsoft.Json;
                     }
                     else if (obtienemepresa.Count > 1)
                     {
+                        List<object> obj = new List<object>();
+                        String titulo = "La empresa no se encontro, pero si coincide con varios grupos";
+                        //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
+                        foreach (Grupo grup in buscaengrupo) {                                                       
+                            obj.Add(grup.grupo);
+                        }
+                        await opcionesAcciones2(context, obj, titulo);
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "La empresa como la ingreso no se encontro, pero existen mas de una coincidencia en grupo"
+                            Text = "si desea buscarla por frupo escriba grupo + el nombre del grupo"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
@@ -1704,7 +1711,7 @@ using Newtonsoft.Json;
                 activity.Attachments.Add(result);
                 await context.PostAsync(activity);*/
                 List<object> opt = new List<object>();
-                var titulo = "Hay mas de un grupo con  "+grupo.ToUpper();
+                var titulo = "Se encontro mas de un grupo con " + grupo.ToUpper();                
                 foreach (Grupo element in obtienemepresa)
                 {
                     Int32 tam = grupo.Length;
@@ -1721,7 +1728,7 @@ using Newtonsoft.Json;
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Escriba la opcion + 'grupo' + nombre del grupo que desea consultar ",
+                    Text = "Escriba 'grupo' + el nombre del grupo que desea consultar ",
                 }.ToAttachment();
 
                 activity.Attachments = new List<Attachment>();
@@ -1732,7 +1739,7 @@ using Newtonsoft.Json;
             else
             {
                 if (obtienemepresa.Count == 1) {
-                    Program.grupo = obtienemepresa[0].grupo;
+                Program.grupo = obtienemepresa[0].grupo;
                 var estatus = bd.obtenerEstatusCajerosGrupo(Program.grupo.ToUpper());
                     if (estatus.Equals(true))
                     {
@@ -1903,7 +1910,7 @@ using Newtonsoft.Json;
                         await context.PostAsync(activity);
                     }
                 }else{
-                    var activity = context.MakeMessage();
+                   /* var activity = context.MakeMessage();
                      activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                      var menuHeroCard = new ThumbnailCard
                      {
@@ -1912,15 +1919,56 @@ using Newtonsoft.Json;
                      }.ToAttachment();
 
                      activity.Attachments = new List<Attachment>();
-                     activity.Attachments.Add(menuHeroCard);
-                    // await SolicitarEstatusCajerosEmpresa(context, Program.grupo);
-                    
+                     activity.Attachments.Add(menuHeroCard);                    
+                    await context.PostAsync(activity);*/
+
+
+                    var activity = context.MakeMessage();
+                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var buscaenempresa = bd.ObtenerEmpresas(Program.grupo);
+                    if (buscaenempresa.Count == 1)
+                    {
+                        string obj = null;
+                        String titulo = "El grupo como lo ingreso no se encontro";
+                        obj = "Coincide con la empresa," + buscaenempresa[0].empresa;
+                        await opcionesAcciones3(context, obj, titulo);
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "Para consultar el estatus de la empresa escriba empresa + nombre de la empresa"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                    }
+                    else if (buscaenempresa.Count > 1)
+                    {
+                        List<object> obj = new List<object>();
+                        String titulo = "El grupo no se encontro, pero si coincide con varias empresas";
+                        //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
+                        foreach (Empresa grup in buscaenempresa)
+                        {
+                            obj.Add(grup.empresa);
+                        }
+                        await opcionesAcciones2(context, obj, titulo);
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "si desea buscarla por empresa escriba empresa + el nombre de la empresa"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                    }
+                    else
+                    {
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "El grupo como la ingreso no se encontro no pertenece a banca transaccional. vuelva a intentarlo"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                    }
+
+
                     await context.PostAsync(activity);
 
-                    //PromptDialog.Confirm(context, this.OnOptionSelected3, "Quieres buscarlo por empresa?");                    
-                    //PromptDialog.Choice(context, this.OnOptionSelected3, new List<String> { SiOption, NoOption }, "Quieres buscarlo por empresa?", "Opcion no valida", 3, PromptStyle.Auto);
-                    //var dialog = new PromptDialog.PromptString("Quieres buscar " + Program.empresa + "por grupo", "Por favor confirme", 2);
-                    //context.Call(dialog, OnOptionSelected3);
 
                 }
             }
