@@ -941,7 +941,7 @@ using Newtonsoft.Json;
              context.Wait(MessageReceivedAsync);*/
          
             //PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "¿Qué deseas consultar?. Te puedo mostrar información sobre ", "Opcion no valida", 4,PromptStyle.PerLine);
-            PromptDialog.Text(context, this.OnOptionSelected, $"Te puedo mostrar información sobre {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Qué deseas consultar?");
+            PromptDialog.Text(context, this.OnOptionSelected, $"Te puedo mostrar información referente a  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?");
 
 
 
@@ -965,7 +965,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, CajeroOption);                       
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "Escribe la opcion deseada + el id del cajero"                            
+                            Text = "Para consultar por favor proporciona la opción deseada + el id del cajero"                            
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
@@ -978,7 +978,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, EmpresaOption);
                         var menuHeroCard2 = new ThumbnailCard
                         {
-                            Text = "Escribe la opcion deseada + el nombre de la empresa"
+                            Text = "Para consultar por favor proporciona la opción deseada + el nombre de la empresa"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard2);
@@ -991,7 +991,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, GrupoOption);
                         var menuHeroCard3 = new ThumbnailCard
                         {
-                            Text = "Escribe la opcion deseada + el nombre del grupo"
+                            Text = "Para consultar por favor proporciona la opción deseada + el nombre del grupo"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard3);
@@ -1047,14 +1047,14 @@ using Newtonsoft.Json;
                                                       Size=ColumnSize.Auto,
                                                       Items = new List<CardElement>(){
                                                            new TextBlock(){
-                                                              Text =$"Sobre {opcion} te puedo mostar?"
+                                                              Text =$"De {opcion} te puedo mostar información como"
                                                           }
                                                           ,
                                                           new TextBlock(){
-                                                              Text =$"Estatus {opcion}"
+                                                              Text =$"Estatus actual de un(a) {opcion}"
                                                           },
                                                           new TextBlock(){
-                                                              Text = $"Historico {opcion}"
+                                                              Text = $"Historico de un(a) {opcion}"
                                                           }
                                                           /*,
                                                           new TextBlock(){
@@ -1445,7 +1445,7 @@ using Newtonsoft.Json;
                  await context.PostAsync(activity);
                  //context.Wait(ConnectOption);*/
                 List<object> opt = new List<object>();
-                var titulo = "Se encontro mas de una empresa con "+empresa.ToUpper();
+                var titulo = "Se encontro mas de una coincidencia con "+empresa.ToUpper();
                 foreach (Empresa element in obtienemepresa)
                 {
                     Int32 tam = empresa.Length;
@@ -1462,7 +1462,7 @@ using Newtonsoft.Json;
                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 var menuHeroCard = new ThumbnailCard
                 {
-                    Text = "Escriba empresa y el nombre de la empresa que desea consultar",
+                    Text = "Para consultar alguna proporciona 'empresa' + nombre de la empresa que desea",
                 }.ToAttachment();
 
                 activity.Attachments = new List<Attachment>();
@@ -1638,7 +1638,7 @@ using Newtonsoft.Json;
                     var activity = context.MakeMessage();
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var buscaengrupo = bd.ObtenerGrupos(Program.empresa);
-                    if (obtienemepresa.Count == 1)
+                    if (buscaengrupo.Count == 1)
                     {                                       
                         string obj = null;
                         String titulo = "La empresa como la ingreso no se encontro";
@@ -1651,7 +1651,7 @@ using Newtonsoft.Json;
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
                     }
-                    else if (obtienemepresa.Count > 1)
+                    else if (buscaengrupo.Count > 1)
                     {
                         List<object> obj = new List<object>();
                         String titulo = "La empresa no se encontro, pero si coincide con varios grupos";
@@ -1662,7 +1662,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones2(context, obj, titulo);
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "si desea buscarla por frupo escriba grupo + el nombre del grupo"
+                            Text = "Para buscarla por grupo escriba grupo + el nombre del grupo"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
@@ -1670,7 +1670,7 @@ using Newtonsoft.Json;
                     else {
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "La empresa como la ingreso no se encontro no pertenece a banca transaccional. vuelva a intentarlo"
+                            Text = "La empresa como la ingreso no se encontro o no pertenece a banca transaccional. vuelva a intentarlo"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
