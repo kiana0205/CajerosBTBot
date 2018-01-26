@@ -1445,7 +1445,7 @@ using Newtonsoft.Json;
                  await context.PostAsync(activity);
                  //context.Wait(ConnectOption);*/
                 List<object> opt = new List<object>();
-                var titulo = "Se encontro mas de una coincidencia con "+empresa.ToUpper();
+                var titulo = "Se encontro mas de una coincidencia con " + empresa.ToUpper();
                 foreach (Empresa element in obtienemepresa)
                 {
                     Int32 tam = empresa.Length;
@@ -1469,88 +1469,30 @@ using Newtonsoft.Json;
                 activity.Attachments.Add(menuHeroCard);
                 await context.PostAsync(activity);
             }//fin del if cuando se encuentra mas de una empresa
-            else
+            else if (obtienemepresa.Count == 1)
             {
-                Program.empresa = obtienemepresa[0].empresa;              
+                Program.empresa = obtienemepresa[0].empresa;
                 var conteo = bd.obtenerConteoCajerosEmpresa(Program.empresa.ToUpper());
-                if (conteo >= 1)
-                { 
-                        var estatus = bd.obtenerEstatusCajerosEmpresa(Program.empresa.ToUpper());
-                        if (estatus.Equals(true))
+                if (conteo == 1)
+                {
+                    var estatus = bd.obtenerEstatusCajerosEmpresa(Program.empresa.ToUpper());
+                    if (estatus.Equals(true))
+                    {
+                        var empresas = bd.ObtenerFallasEmpresa(Program.empresa.ToUpper());
+                        if (empresas != null && empresas.Count > 0)
                         {
-                            var empresas = bd.ObtenerFallasEmpresa(Program.empresa.ToUpper());
-                            if (empresas != null && empresas.Count > 0)
-                            {                               
-                                var activity = context.MakeMessage();
-                            /* activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                             var menuHeroCard = new ThumbnailCard
-                             {
-                                 //Subtitle = cajeroBean.conteo + " falla(s)",
-                                 Title = "La empresa " + empresa.ToUpper() + " tiene las siguientes fallas: ",
-                                 //Images = new List<CardImage> {
-                                 //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
-                                 //}
-                             }.ToAttachment();
-
-                             activity.Attachments = new List<Attachment>();
-                             activity.Attachments.Add(menuHeroCard);
-
-                             await context.PostAsync(activity);
-
-                             for (int i = 0; i < empresas.Count; i++)
-                             {
-                                 Empresa cajeroBean = empresas[i];
-                                 var tipofalla = String.Empty;
-                                 var folio = String.Empty;
-                                 switch (cajeroBean.tipoFalla)
-                                 {
-                                     case "ComunicacionEnergia":
-                                         tipofalla = "Cajero sin energía";
-                                         break;
-                                     case "ErrorSinEfectivo":
-                                         tipofalla = "Cajero sin efectivo";
-                                         break;
-                                     case "ModoSupervisor":
-                                         tipofalla = "Modo Supervisor";
-                                         break;
-                                     case "FallaHardware":
-                                         tipofalla = "Falla en el hardware";
-                                         break;
-                                     case "ProblemaLocal":
-                                         tipofalla = "Cajero con problema local";
-                                         break;
-                                     case "TrxsNoMonetarias":
-                                         tipofalla = "transacciones no monetarias";
-                                         break;
-                                     default:
-                                         tipofalla = "Sin identificar";
-                                         break;
-                                 }
-
-                                 if (cajeroBean.folio == "")
-                                 {
-                                     folio = "Sin folio";
-                                 }
-                                 else
-                                 {
-                                     folio = cajeroBean.folio;
-                                 }
-
-                                 await context.PostAsync("Cajero: " + cajeroBean.cajero + ",  Falla: " + tipofalla + ",  Folio: " + folio);
-                             }*/
-
-                            //Program.empresa = empresas[0].empresa;
+                            var activity = context.MakeMessage();
                             List<object> opt = new List<object>();
                             Int32 tam = Program.empresa.Length;
                             string nombre = null;
                             if (tam > 40) { nombre = Program.empresa.Substring(0, tam - 15); }
                             else if (tam >= 30 && tam < 40) { nombre = Program.empresa.Substring(0, tam - 8); } else { nombre = Program.empresa; }
-                            
 
-                                var titulo = nombre +" tiene "+empresas.Count+" cajeros con fallas: ";
-                                foreach (Empresa element in empresas)
-                                {
-                                    var tipofalla2 = String.Empty;
+
+                            var titulo = nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            foreach (Empresa element in empresas)
+                            {
+                                var tipofalla2 = String.Empty;
                                 switch (element.tipoFalla)
                                 {
                                     case "ComunicacionEnergia":
@@ -1576,107 +1518,75 @@ using Newtonsoft.Json;
                                         break;
                                 }
                                 var menu = element.cajero + "   " + tipofalla2 + "  " + element.folio;
-                                    opt.Add(menu);
-                                }
-
-                                await opcionesAcciones2(context, opt, titulo);
-                                //var activity = context.MakeMessage();
-                                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                                var menuHeroCard = new ThumbnailCard
-                                {
-                                    Text = "Algo más en que le podamos ayudar?",
-                                    Subtitle = "Espero que la información sea de su utilidad"
-
-                                }.ToAttachment();
-
-                                activity.Attachments = new List<Attachment>();
-                                activity.Attachments.Add(menuHeroCard);
-                                await context.PostAsync(activity);
-
-                            //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
-                        }
-                            else
-                            {
-                                var activity = context.MakeMessage();
-                                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                                var menuHeroCard = new ThumbnailCard
-                                {
-                                    Text = "Algo más en que le podamos ayudar?",
-                                    Subtitle = "Verifique el nombre de la empresa",
-                                    //Title = "No se identifico el cajero como parte de banca transaccional",
-                                    //Images = new List<CardImage> {
-                                    //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
-                                    //}
-                                }.ToAttachment();
-
-                                activity.Attachments = new List<Attachment>();
-                                activity.Attachments.Add(menuHeroCard);
-                                await context.PostAsync(activity);
+                                opt.Add(menu);
                             }
-                        }//fin del if cuando hay fallas
-                        else
-                        {
-                            var activity = context.MakeMessage();
-                            /*   activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
-                               await context.PostAsync(activity);
-                               await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
 
-
+                            await opcionesAcciones2(context, opt, titulo);
+                            //var activity = context.MakeMessage();
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                             var menuHeroCard = new ThumbnailCard
                             {
                                 Text = "Algo más en que le podamos ayudar?",
-                                Subtitle = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper(),
+                                Subtitle = "Espero que la información sea de su utilidad"
+
+                            }.ToAttachment();
+
+                            activity.Attachments = new List<Attachment>();
+                            activity.Attachments.Add(menuHeroCard);
+                            await context.PostAsync(activity);
+
+                            //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                        }
+                        else
+                        {
+                            var activity = context.MakeMessage();
+                            activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                            var menuHeroCard = new ThumbnailCard
+                            {
+                                Text = "Algo más en que le podamos ayudar?",
+                                Subtitle = "Verifique el nombre de la empresa",
+                                //Title = "No se identifico el cajero como parte de banca transaccional",
+                                //Images = new List<CardImage> {
+                                //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
+                                //}
                             }.ToAttachment();
 
                             activity.Attachments = new List<Attachment>();
                             activity.Attachments.Add(menuHeroCard);
                             await context.PostAsync(activity);
                         }
+                    }//fin del if cuando hay fallas
+                    else
+                    {
+                        var activity = context.MakeMessage();
+                        /*   activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
+                           await context.PostAsync(activity);
+                           await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
+
+
+                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "Algo más en que le podamos ayudar?",
+                            Subtitle = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper(),
+                        }.ToAttachment();
+
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                    }
                 }//fin del id cuando se encutra una empresa
-                else {                    
+                else
+                {
                     var activity = context.MakeMessage();
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    var buscaengrupo = bd.ObtenerGrupos(Program.empresa);
-                    if (buscaengrupo.Count == 1)
-                    {                                       
-                        string obj = null;
-                        String titulo = "La empresa como la ingreso no se encontro";
-                        obj = "Coincide con el grupo," + buscaengrupo[0].grupo ;
-                        await opcionesAcciones3(context, obj, titulo);
-                        var menuHeroCard = new ThumbnailCard
-                        {
-                            Text = "Para consultar el estatus del grupo escriba grupo + nombre del grupo"
-                        }.ToAttachment();
-                        activity.Attachments = new List<Attachment>();
-                        activity.Attachments.Add(menuHeroCard);
-                    }
-                    else if (buscaengrupo.Count > 1)
+                    var menuHeroCard = new ThumbnailCard
                     {
-                        List<object> obj = new List<object>();
-                        String titulo = "La empresa no se encontro, pero si coincide con varios grupos";
-                        //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
-                        foreach (Grupo grup in buscaengrupo) {                                                       
-                            obj.Add(grup.grupo);
-                        }
-                        await opcionesAcciones2(context, obj, titulo);
-                        var menuHeroCard = new ThumbnailCard
-                        {
-                            Text = "Para buscarla por grupo escriba grupo + el nombre del grupo"
-                        }.ToAttachment();
-                        activity.Attachments = new List<Attachment>();
-                        activity.Attachments.Add(menuHeroCard);
-                    }
-                    else {
-                        var menuHeroCard = new ThumbnailCard
-                        {
-                            Text = "La empresa como la ingreso no se encontro o no pertenece a banca transaccional. vuelva a intentarlo"
-                        }.ToAttachment();
-                        activity.Attachments = new List<Attachment>();
-                        activity.Attachments.Add(menuHeroCard);
-                    }
+                        Text = $"La empresa {Program.empresa} no tiene fallas en los cajeros"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
 
-                                 
                     await context.PostAsync(activity);
                     //await context.PostAsync(Program.empresa);
 
@@ -1685,8 +1595,57 @@ using Newtonsoft.Json;
                     //PromptDialog.Choice(context, this.OnOptionSelected2, new List<String> { SiOption, NoOption}, "Quieres buscarlo por grupo?", "Opcion no valida", 3, PromptStyle.Auto);
                     //var dialog = new PromptDialog.PromptString("Quieres buscar "+Program.empresa+"por grupo", "Por favor confirme",2);
                     //context.Call(dialog, OnOptionSelected2);
-                   
+
                 }
+            }
+            else {
+
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                var buscaengrupo = bd.ObtenerGrupos(Program.empresa);
+                if (buscaengrupo.Count == 1)
+                {
+                    string obj = null;
+                    String titulo = "La empresa como la ingreso no se encontro";
+                    obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
+                    await opcionesAcciones3(context, obj, titulo);
+                    var menuHeroCard = new ThumbnailCard
+                    {
+                        Text = "Para consultar el estatus del grupo escriba grupo + nombre del grupo"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                }
+                else if (buscaengrupo.Count > 1)
+                {
+                    List<object> obj = new List<object>();
+                    String titulo = "La empresa no se encontro, pero si coincide con varios grupos";
+                    //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
+                    foreach (Grupo grup in buscaengrupo)
+                    {
+                        obj.Add(grup.grupo);
+                    }
+                    await opcionesAcciones2(context, obj, titulo);
+                    var menuHeroCard = new ThumbnailCard
+                    {
+                        Text = "Para buscarla por grupo escriba grupo + el nombre del grupo"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                }
+                else
+                {
+                    var menuHeroCard = new ThumbnailCard
+                    {
+                        Text = "La empresa como la ingreso no se encontro o no pertenece a banca transaccional. vuelva a intentarlo"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard);
+                }
+
+                await context.PostAsync(activity);
+
+
             }
             context.Wait(MessageReceivedAsync);
         }
