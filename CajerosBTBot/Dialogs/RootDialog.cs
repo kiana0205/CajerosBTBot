@@ -946,7 +946,7 @@ using Newtonsoft.Json;
              var menuHeroCard = new ThumbnailCard
              {
 
-                 Text = $"Te puedo mostrar información referente a estatus o historico de  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?"
+                 Text = $"Te puedo mostrar información referente a el estatus o historico de  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?"
                  //Images = new List<CardImage> {
                  //    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
                  //}
@@ -1444,10 +1444,17 @@ using Newtonsoft.Json;
                 var menuHeroCard = new ThumbnailCard
                 {
                     //Subtitle = "El cajero " + cajero.ToUpper() + " no se encontro",
-                    Text = "No se encontraron fallas en el cajero " + cajero.ToUpper()
+                    Text = "El cajero " + cajero.ToUpper()+" no tiene fallas recientes"
                 }.ToAttachment();
                 activity.Attachments = new List<Attachment>();
                 activity.Attachments.Add(menuHeroCard);
+                await context.PostAsync(activity);
+                var menuHeroCard2 = new ThumbnailCard
+                {
+                    Text = $"Puedes consultar el historico del mismo escribiendo 'historico cajero' o puedes consultar el estatus de otro cajero"
+                }.ToAttachment();
+                activity.Attachments = new List<Attachment>();
+                activity.Attachments.Add(menuHeroCard2);
                 await context.PostAsync(activity);
                 //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
             }
