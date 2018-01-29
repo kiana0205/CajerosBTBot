@@ -965,7 +965,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, CajeroOption);
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "Para consultar por favor proporciona la opción deseada + el id del cajero"
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el id del cajero"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
@@ -978,7 +978,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, EmpresaOption);
                         var menuHeroCard2 = new ThumbnailCard
                         {
-                            Text = "Para consultar por favor proporciona la opción deseada + el nombre de la empresa"
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el nombre de la empresa"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard2);
@@ -991,7 +991,7 @@ using Newtonsoft.Json;
                         await opcionesAcciones(context, GrupoOption);
                         var menuHeroCard3 = new ThumbnailCard
                         {
-                            Text = "Para consultar por favor proporciona la opción deseada + el nombre del grupo"
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el nombre del grupo"
                         }.ToAttachment();
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard3);
@@ -1604,11 +1604,17 @@ using Newtonsoft.Json;
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = $"La empresa {Program.empresa} no tiene fallas en los cajeros"
+                        Text = $"La empresa {Program.empresa} no tiene fallas recientes en los cajeros"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
-
+                    await context.PostAsync(activity);
+                    var menuHeroCard2 = new ThumbnailCard
+                    {
+                        Text = $"Puedes consultar el historico de la misma escribiendo 'historico empresa' o puedes consultar el estatus de otra empresa"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard2);
                     await context.PostAsync(activity);
                     //await context.PostAsync(Program.empresa);
 
@@ -2057,8 +2063,9 @@ using Newtonsoft.Json;
                  activity.Attachments.Add(menuHeroCard);
                  await context.PostAsync(activity);*/
 
-                List<object> opt = new List<object>();
-                var titulo = "La empresa " + Program.empresa.ToUpper()+" ha tenido las siguientes fallas ";
+                 List<object> opt = new List<object>();
+                //string opt = null;
+                var titulo = "Historico fallas empresa " + Program.empresa.ToUpper();
 
                 for (int i = 0; i < historico.Count; i++)
                 {
@@ -2100,11 +2107,12 @@ using Newtonsoft.Json;
                         folio = cajeroBean.folio;
                     }
 
-                    //await context.PostAsync("Falla: " + tipofalla + ",  Folio: " + folio + ", Fecha: " + cajeroBean.fecha);
-                    var menu = cajeroBean.cajero + "   " + tipofalla + "   " + folio + "  " + cajeroBean.fecha;
+                    
+                    var menu = cajeroBean.cajero+" tuvo falla tipo "+tipofalla+" en "+cajeroBean.fecha;
                     opt.Add(menu);
-
                 }
+
+                int tamlista = opt.Count;
 
                 await opcionesAcciones2(context, opt, titulo);
 
