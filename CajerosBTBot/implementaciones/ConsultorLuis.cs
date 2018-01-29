@@ -178,10 +178,12 @@ namespace CajerosBTBot.implementaciones
                     return Intensiones.SolicitarResponsableCajeroEmpresa;
                 case "SolicitarResponsableCajeroGrupo":
                     return Intensiones.SolicitarResponsableCajeroGrupo;
+                case "SolicitarCerrarDialogo":
+                    return Intensiones.SolicitarCerrarDialogo;
                 case "Saludo":
                     return Intensiones.Saludo;
                 case "Ayuda":
-                    return Intensiones.Ayuda;
+                    return Intensiones.Ayuda;               
                 default:
                     return Intensiones.None;
             }

@@ -31,8 +31,8 @@ using Newtonsoft.Json;
         private const string EmpresaOption = "empresas";
         private const string GrupoOption = "grupos";
 
-        private const string SiOption = "si";
-        private const string NoOption = "no";
+        //private const string SiOption = "si";
+        //private const string NoOption = "no";
         public static Int32 cnt = 0;
         public static class Program {
             public static string cajero;
@@ -872,6 +872,35 @@ using Newtonsoft.Json;
                     //Program.grupo = objetoLuis.Entidades[1].entity;
                     await SolicitarResponsableGrupo(context, Program.grupo);
                     break;
+                case Intensiones.SolicitarCerrarDialogo:
+                    if (textoDelUsuario.Equals("si")) {
+                        var activity3 = context.MakeMessage();
+                        activity3.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard7 = new ThumbnailCard
+                        {
+                            Text = "Fue un placer servile...",
+                        }.ToAttachment();
+
+                        activity3.Attachments = new List<Attachment>();
+                        activity3.Attachments.Add(menuHeroCard7);
+                        await context.PostAsync(activity3);
+                        //await ManejarSaludo(context);
+                    }
+                    if (textoDelUsuario.Equals("no"))
+                    {
+                        var activity4 = context.MakeMessage();
+                        activity4.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard8 = new ThumbnailCard
+                        {
+                            Text = "Bien! Deseas hacer otra consulta. Te recordamos que ..",
+                        }.ToAttachment();
+
+                        activity4.Attachments = new List<Attachment>();
+                        activity4.Attachments.Add(menuHeroCard8);
+                        await context.PostAsync(activity4);                   
+                        await ManejarSaludo(context);
+                    }
+                    break;
                 default:
                     await context.PostAsync(intension.ToString());
                     context.Wait(MessageReceivedAsync);
@@ -913,35 +942,36 @@ using Newtonsoft.Json;
         //private async void MostrarAyuda(IDialogContext context)
         private async Task ManejarSaludo(IDialogContext context)
         {
-            /* var activity = context.MakeMessage();
+             var activity = context.MakeMessage();
              var menuHeroCard = new ThumbnailCard
              {
 
-                 Text = "Bienvenido ChatBot Banca Transaccional",
-                 Images = new List<CardImage> {
-                     new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
-                 }
+                 Text = $"Te puedo mostrar información referente a estatus o historico de  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?"
+                 //Images = new List<CardImage> {
+                 //    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
+                 //}
              }.ToAttachment();
 
              activity.Attachments = new List<Attachment>();
              activity.Attachments.Add(menuHeroCard);
 
 
-             // activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
-             List<string> choices = new List<string>();
-             choices.Add("Estatus del cajero  XXXXX");
-             choices.Add("Fecha probable solucion del cajero XXXXX");
-             choices.Add("Estatus cajeros de la empresa XXXXX");
+            // activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
+            //List<string> choices = new List<string>();
+            //choices.Add("Estatus del cajero  XXXXX");
+            //choices.Add("Fecha probable solucion del cajero XXXXX");
+            //choices.Add("Estatus cajeros de la empresa XXXXX");
 
 
-             var result = ShowOptions2(choices);
-             var reply = context.MakeMessage();
-             reply.Attachments.Add(result);
-             await context.PostAsync(reply);
-             context.Wait(MessageReceivedAsync);*/
+            //var result = ShowOptions2(choices);
+            //var reply = context.MakeMessage();
+            //reply.Attachments.Add(result);
+            //await context.PostAsync(reply);
+            await context.PostAsync(activity);
+            //context.Wait(MessageReceivedAsync);
 
             //PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "¿Qué deseas consultar?. Te puedo mostrar información sobre ", "Opcion no valida", 4,PromptStyle.PerLine);
-            PromptDialog.Text(context, this.OnOptionSelected, $"Te puedo mostrar información referente a  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?");
+            //PromptDialog.Text(context, this.OnOptionSelected, $"Te puedo mostrar información referente a  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?");
 
 
 

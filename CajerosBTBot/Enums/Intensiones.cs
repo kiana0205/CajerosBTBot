@@ -18,6 +18,7 @@ namespace CajerosBTBot.Enums
         SolicitarResponsableCajeroEmpresa,
         SolicitarResponsableCajeroGrupo,
         solicitarFechaSolucion,
+        SolicitarCerrarDialogo,
         Saludo,
         Ayuda
     }
