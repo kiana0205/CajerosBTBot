@@ -1757,7 +1757,7 @@ using Newtonsoft.Json;
                 {
                     cnt = 0;
                     List<object> opt = new List<object>();
-                    var titulo = "Las coincidencias encontrads con " + grupo.ToUpper() + " son";
+                    var titulo = "Las coincidencias encontradas con " + grupo.ToUpper() + " son";
                     foreach (Grupo element in obtienemepresa)
                     {
                         Int32 tam = grupo.Length;
@@ -1774,7 +1774,7 @@ using Newtonsoft.Json;
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Escriba 'grupo' + el nombre del grupo que desea consultar ",
+                        Text = "Para consultar algun grupo proporciona 'grupo' <Nombre Grupo> que desea consultar ",
                     }.ToAttachment();
 
                     activity.Attachments = new List<Attachment>();
@@ -1804,7 +1804,7 @@ using Newtonsoft.Json;
                             if (tam >= 40) { nombre = Program.grupo.Substring(0, tam - 15); }
                             else if (tam >= 30 && tam < 40) { nombre = Program.grupo.Substring(0, tam - 8); } else { nombre = Program.grupo; }
 
-                            var titulo =  nombre+" tiene fallas en ";
+                            var titulo = "El grupo " + nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
                             foreach (Grupo element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1841,7 +1841,7 @@ using Newtonsoft.Json;
 
                                 //var menu = nombre2.ToLower()+","+element.cajero + "," + tipofalla2 + "," + element.folio;
                                 //var menu = "La empresa"+nombre2.ToLower() + "," + element.cajero + ", de tipo " + tipofalla2;
-                                opt = "La empresa " + nombre2.ToLower() + ",en el cajero " + element.cajero + ", de tipo " + tipofalla2;
+                                opt = "El cajero " + element.cajero + "  de la empresa " + element.empresa + ",tiene falla tipo " + tipofalla2 + ", con fecha del " + element.fecha + ", con folio " + element.folio + ", responsable " + element.responsable + ", y fecha posible de solución " + element.fechasolucion;
                                 //opt.Add(menu);
                                 await opcionesAcciones3(context, opt, titulo);
                             }
@@ -1853,8 +1853,8 @@ using Newtonsoft.Json;
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                             var menuHeroCard = new ThumbnailCard
                             {
-                                Text = "Algo más en que le podamos ayudar?",
-                                Subtitle = "Espero que la información sea de su utilidad"
+                                Text = "Puedes consultar información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>",
+                                Subtitle = "Espero que la información haya sido de utilidad"
 
                             }.ToAttachment();
 
@@ -1868,8 +1868,8 @@ using Newtonsoft.Json;
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                             var menuHeroCard = new ThumbnailCard
                             {
-                                Text = "Algo más en que le podamos ayudar?",
-                                Subtitle = "Verifique el nombre del grupo",
+                                Text = "Puedes consultar Información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                                //Subtitle = "Verifique el nombre del grupo",
                             }.ToAttachment();
 
                             activity.Attachments = new List<Attachment>();
@@ -1883,11 +1883,18 @@ using Newtonsoft.Json;
                         activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = $"El grupo {Program.grupo} no tiene fallas en los cajeros"
+                            Text = $"El grupo {Program.grupo} no tiene fallas recientes en los cajeros"
                         }.ToAttachment();
 
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                        var menuHeroCard2 = new ThumbnailCard
+                        {
+                            Text = "Quieres Información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard2);
                         await context.PostAsync(activity);
                     }
                 }
@@ -1897,7 +1904,7 @@ using Newtonsoft.Json;
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = $"El grupo {Program.grupo} no tiene fallas en los cajeros"
+                        Text = "Quieres Información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
@@ -1914,12 +1921,12 @@ using Newtonsoft.Json;
                 if (buscaenempresa.Count == 1)
                 {
                     string obj = null;
-                    String titulo = "El grupo como lo ingreso no se encontro";
-                    obj = "Coincide con la empresa," + buscaenempresa[0].empresa;
+                    String titulo = "No es posible identificar el elemnto como un grupo";
+                    obj = "Pero se encontro una coincidencia con la empresa," + buscaenempresa[0].empresa;
                     await opcionesAcciones3(context, obj, titulo);
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Para consultar el estatus de la empresa escriba empresa + nombre de la empresa"
+                        Text = "Si quieres información de la empresa, por favor escribe Empresa <Nombre Empresa>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
@@ -1927,7 +1934,7 @@ using Newtonsoft.Json;
                 else if (buscaenempresa.Count > 1)
                 {
                     List<object> obj = new List<object>();
-                    String titulo = "El grupo no se encontro, pero si coincide con varias empresas";
+                    String titulo = "No es posible identificar el elemento como un grupo, pero coincide con varias empresas";
                     //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
                     foreach (Empresa grup in buscaenempresa)
                     {
@@ -1936,7 +1943,7 @@ using Newtonsoft.Json;
                     await opcionesAcciones2(context, obj, titulo);
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "si desea buscarla por empresa escriba empresa + el nombre de la empresa"
+                        Text = "Si quieres información de la empresa, por favor escribe Empresa <Nombre Empresa>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
@@ -1945,7 +1952,7 @@ using Newtonsoft.Json;
                 {
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "El grupo como la ingreso no se encontro no pertenece a banca transaccional. vuelva a intentarlo"
+                        Text = "No es posible identificar ese grupo o no pertenece a banca transaccional, verifica el nombre del grupo"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);

@@ -660,7 +660,8 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
 
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("SELECT a.id_cajero as cajero, e.grupo,e.empresa, s.tipo_falla as tipoFalla, e.id_grupo, f.folio  ");
+                    sb.Append("SELECT a.id_cajero as cajero, e.grupo,e.empresa, s.tipo_falla as tipoFalla, e.id_grupo, f.folio,  ");
+                    sb.Append(" f.fecha_inicio as fecha, f.folio, f.responsable, f.fecha_estimada_solucion as fechasolucion ");
                     sb.Append("FROM falla_f_fallas_diaria f");
                     sb.Append(" left join falla_d_fallas s on s.id_falla=f.id_falla ");
                     sb.Append(" left join atm_d_cajero a on a.id_cajero = f.id_producto");
@@ -685,6 +686,9 @@ namespace CajerosBTBot.implementaciones
                             cajeroBean.id_grupo = myReader["id_grupo"].ToString();
                             cajeroBean.tipoFalla = myReader["tipoFalla"].ToString();
                             cajeroBean.folio = myReader["folio"].ToString();
+                            cajeroBean.fecha = myReader["fecha"].ToString();
+                            cajeroBean.responsable = myReader["responsable"].ToString();
+                            cajeroBean.fechasolucion = myReader["fechasolucion"].ToString();
 
                             cajeros.Add(cajeroBean);
                         }
