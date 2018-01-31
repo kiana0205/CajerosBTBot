@@ -54,6 +54,44 @@ namespace CajerosBTBot.implementaciones
             return est;
         }
 
+        public Boolean ObtenerCajero(string cajero)
+        {
+            Boolean est = false;
+            try
+            { 
+                string myConnStr = ConfigurationManager.ConnectionStrings["Dbconnection"].ConnectionString;
+
+                using (SqlConnection connection = new SqlConnection(myConnStr))
+                {
+                    connection.Open();
+
+                    StringBuilder cn = new StringBuilder();
+                    cn.Append(" select count(1) from atm_d_cajero ");
+                    cn.Append(" where id_cajero = '" + cajero + "'");
+                    cn.Append(" and tipo_producto=2 ");
+                    String res = cn.ToString();
+                    SqlCommand comm = new SqlCommand(res, connection);
+                    Int32 count = (Int32)comm.ExecuteScalar();
+                    if (count > 0)
+                    {
+                        est = true;
+
+                    }
+                    else
+                    {
+                        est = false;
+                    }
+                    connection.Close();
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+
+            return est;
+        }
+
         public List<Cajero> ObtenerFallaCajero(string cajero)
         {
             List<Cajero> cajeros = new List<Cajero>();
@@ -70,14 +108,18 @@ namespace CajerosBTBot.implementaciones
                     connection.Open();
                       
                         StringBuilder sb = new StringBuilder();
-                        sb.Append("SELECT d.id_producto as cajero, d.fecha_inicio as fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo, d.responsable, d.fecha_estimada_solucion as fechasolucion ");
-                        sb.Append("FROM falla_f_fallas_diaria d");
+                        sb.Append("SELECT d.id_producto as cajero, d.fecha_inicio as fecha, f.tipo_falla as falla, d.folio, sum(d.conteo) as conteo, d.responsable, d.fecha_estimada_solucion as fechasolucion, ");
+                        sb.Append(" e.empresa, e.grupo");
+                        sb.Append(" FROM falla_f_fallas_diaria d");
                         sb.Append(" join falla_d_fallas f ");
                         sb.Append(" on f.id_falla = d.id_falla");
+                        sb.Append(" left join atm_d_cajero a on a.id_cajero = d.id_producto");
+                        sb.Append(" left join cat_d_empresa_grupo e on e.id_empresa = a.id_empresa ");
                         sb.Append(" where d.id_producto='" + cajero + "'");
                         sb.Append(" and d.id_tipo_producto = 2");
-                        sb.Append(" group by d.id_producto, d.fecha_inicio, f.tipo_falla, d.folio, d.responsable, d.fecha_estimada_solucion");
-                        String sql = sb.ToString();
+                        sb.Append(" group by d.id_producto, d.fecha_inicio, f.tipo_falla, d.folio, d.responsable, d.fecha_estimada_solucion,");
+                        sb.Append(" e.empresa, e.grupo");
+                    String sql = sb.ToString();
 
 
                         using (SqlCommand command = new SqlCommand(sql, connection))
@@ -96,6 +138,8 @@ namespace CajerosBTBot.implementaciones
                                 cajeroBean.folio = myReader["folio"].ToString();
                                 cajeroBean.responsable= myReader["responsable"].ToString();
                                 cajeroBean.fechasolucion= myReader["fechasolucion"].ToString();
+                                cajeroBean.empresa= myReader["empresa"].ToString();
+                                cajeroBean.grupo= myReader["grupo"].ToString();
 
                             cajeros.Add(cajeroBean);
                             }

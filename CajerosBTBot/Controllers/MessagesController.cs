@@ -183,7 +183,8 @@ using System.Web;
                     foreach (var newMember in update.MembersAdded) {
                         if (newMember.Id != message.Recipient.Id) {
                             var reply = message.CreateReply();
-                            reply.Text = $"Hola! Bienvenido. En este lugar podrás conocer información sobre fallas en cajeros";
+                            //reply.AddHeroCard("Bienvenido.En este lugar podrás conocer información sobre fallas en cajeros.Escribe tu solicitud o escribe 'ayuda'");
+                            reply.Text = $"Bienvenido. En este lugar podrás conocer información sobre fallas en cajeros. Escribe tu solicitud o escribe 'ayuda'";
                             Client.Conversations.ReplyToActivityAsync(reply);
                         }
                     }

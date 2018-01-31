@@ -20,5 +20,8 @@ namespace CajerosBTBot.Bean
 
         public string fechasolucion { get; set; }
 
+        public string empresa { get; set; }
+        public string grupo { get; set; }
+
     }
 }

@@ -11,6 +11,8 @@ namespace CajerosBTBot.Interfaces
 
         Boolean ObtenerEstatusCajero(string cajero);
 
+        Boolean ObtenerCajero(string cajero);
+
         List<Cajero> ObtenerFallaCajero(string cajerp);
 
         Boolean obtenerEstatusCajerosEmpresa(string empresa);

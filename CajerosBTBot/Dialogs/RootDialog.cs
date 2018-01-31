@@ -723,7 +723,6 @@ using Newtonsoft.Json;
             {
                 case Intensiones.Saludo:
                     await ManejarSaludo(context);
-                    //context.Wait(MessageReceivedAsync);
                     break;
                 case Intensiones.Ayuda:
                     await ManejarSaludo(context);
@@ -946,14 +945,21 @@ using Newtonsoft.Json;
              var menuHeroCard = new ThumbnailCard
              {
 
-                 Text = $"Te puedo mostrar información referente a el estatus o historico de  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?"
-                 //Images = new List<CardImage> {
-                 //    new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/banorte2.jpg" }
-                 //}
+                 Text = $"Hola, Te puedo mostrar el estatus de un cajero, empresa o grupo.  Ejemplos: Estatus NM1520 o Empresa<Nombre esmpresa> o Grupo<Nombre Grupo>"
              }.ToAttachment();
 
              activity.Attachments = new List<Attachment>();
              activity.Attachments.Add(menuHeroCard);
+
+           /* var activity2 = context.MakeMessage();
+            var menuHeroCard2 = new ThumbnailCard
+            {
+
+                Text = $"Ejemplos: Estatus NM1520 o Empresa<Nombre esmpresa> o Grupo<Nombre Grupo>"
+            }.ToAttachment();
+
+            activity2.Attachments = new List<Attachment>();
+            activity2.Attachments.Add(menuHeroCard2);*/
 
 
             // activity.Text = "En este chat puedes preguntar sobre informacion de cajeros.";
@@ -968,6 +974,7 @@ using Newtonsoft.Json;
             //reply.Attachments.Add(result);
             //await context.PostAsync(reply);
             await context.PostAsync(activity);
+           // await context.PostAsync(activity2);
             //context.Wait(MessageReceivedAsync);
 
             //PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "¿Qué deseas consultar?. Te puedo mostrar información sobre ", "Opcion no valida", 4,PromptStyle.PerLine);
@@ -1311,153 +1318,164 @@ using Newtonsoft.Json;
 
         private async Task SolicitarEstatusCajero(IDialogContext context, string cajero) {
             IConsultorDB bd = new CajeroDaoImpl();
-            var estatus = bd.ObtenerEstatusCajero(cajero.ToUpper());
-            if (estatus.Equals(true))
-            {
-                List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
-                //var cajeros = bd.ObtenerFallaCajero(cajero.ToUpper());
-                //if (cajeros != null && cajeros.Count > 0)
-                if (caj != null && caj.Count > 0)
+            var buscacajero = bd.ObtenerCajero(cajero.ToUpper());
+            if (buscacajero.Equals(true)) {
+
+                var estatus = bd.ObtenerEstatusCajero(cajero.ToUpper());
+                if (estatus.Equals(true))
                 {
-                    // Cajero cajeroBean = cajeros[0];
-                    var activity = context.MakeMessage();
-                    /* activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                     var menuHeroCard = new ThumbnailCard
-                     {
-                         Text = "El cajero " + cajero.ToUpper() + " tiene: "+ cajeroBean.conteo + " falla(s)"
-                         //Title = "El cajero " + cajero.ToUpper() + " tiene: ",
-                         //Subtitle = cajeroBean.conteo + " falla(s)",
-                        // Images = new List<CardImage> {
-                        // new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
-                        // }
-                     }.ToAttachment();
-
-                     activity.Attachments = new List<Attachment>();
-                     activity.Attachments.Add(menuHeroCard);
-                     await context.PostAsync(activity);*/
-
-                    /*  var tipofalla = String.Empty;
-                      switch (cajeroBean.tipoFalla) {
-                          case "ComunicacionEnergia":
-                              tipofalla = "Cajero sin energía";
-                              break;
-                          case "ErrorSinEfectivo":
-                              tipofalla = "Cajero sin efectivo";
-                              break;
-                          case "ModoSupervisor":
-                              tipofalla = "Modo Supervisor";
-                              break;
-                          case "FallaHardware":
-                              tipofalla = "Falla en el hardware";
-                              break;
-                          case "ProblemaLocal":
-                              tipofalla = "Cajero con problema local";
-                              break;
-                          case "TrxsNoMonetarias":
-                              tipofalla = "Transacciones no monetarias";
-                              break;
-                          default:
-                              tipofalla = "Sin identificar";
-                              break;
-                      }*/
-
-                    //await context.PostAsync("Falla: " + tipofalla + ",    Fecha: " + cajeroBean.fecha);
-                    // await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
-
-                    // List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
-                    Program.cajero = cajero.ToUpper();
-                    string menu = null;
-                    List<object> opt = new List<object>();
-                    var titulo = "Se encontraron " + caj.Count + " falla(s) en el cajero " + Program.cajero;
-                    foreach (Cajero element in caj)
+                    List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
+                    if (caj != null && caj.Count > 0)
                     {
-                        var tipofalla2 = String.Empty;
-                        switch (element.tipoFalla)
+                        // Cajero cajeroBean = cajeros[0];
+                        var activity = context.MakeMessage();
+                        /* activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                         var menuHeroCard = new ThumbnailCard
+                         {
+                             Text = "El cajero " + cajero.ToUpper() + " tiene: "+ cajeroBean.conteo + " falla(s)"
+                             //Title = "El cajero " + cajero.ToUpper() + " tiene: ",
+                             //Subtitle = cajeroBean.conteo + " falla(s)",
+                            // Images = new List<CardImage> {
+                            // new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/cajeroerror.jpg" }
+                            // }
+                         }.ToAttachment();
+
+                         activity.Attachments = new List<Attachment>();
+                         activity.Attachments.Add(menuHeroCard);
+                         await context.PostAsync(activity);*/
+
+                        /*  var tipofalla = String.Empty;
+                          switch (cajeroBean.tipoFalla) {
+                              case "ComunicacionEnergia":
+                                  tipofalla = "Cajero sin energía";
+                                  break;
+                              case "ErrorSinEfectivo":
+                                  tipofalla = "Cajero sin efectivo";
+                                  break;
+                              case "ModoSupervisor":
+                                  tipofalla = "Modo Supervisor";
+                                  break;
+                              case "FallaHardware":
+                                  tipofalla = "Falla en el hardware";
+                                  break;
+                              case "ProblemaLocal":
+                                  tipofalla = "Cajero con problema local";
+                                  break;
+                              case "TrxsNoMonetarias":
+                                  tipofalla = "Transacciones no monetarias";
+                                  break;
+                              default:
+                                  tipofalla = "Sin identificar";
+                                  break;
+                          }*/
+
+                        //await context.PostAsync("Falla: " + tipofalla + ",    Fecha: " + cajeroBean.fecha);
+                        // await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+
+                        // List<Cajero> caj = bd.ObtenerFallaCajero(cajero.ToUpper());
+                        Program.cajero = cajero.ToUpper();
+                        string menu = null;
+                        List<object> opt = new List<object>();
+                        var titulo = "Se encontraron " + caj.Count + " falla(s) en el cajero " + Program.cajero;
+                        foreach (Cajero element in caj)
                         {
-                            case "ComunicacionEnergia":
-                                tipofalla2 = "Sin energía";
-                                break;
-                            case "ErrorSinEfectivo":
-                                tipofalla2 = "Sin efectivo";
-                                break;
-                            case "ModoSupervisor":
-                                tipofalla2 = "Modo Supervisor";
-                                break;
-                            case "FallaHardware":
-                                tipofalla2 = "Falla hardware";
-                                break;
-                            case "ProblemaLocal":
-                                tipofalla2 = "Problema local";
-                                break;
-                            case "TrxsNoMonetarias":
-                                tipofalla2 = "Trans. no monetarias";
-                                break;
-                            default:
-                                tipofalla2 = "Sin identificar";
-                                break;
+                            var tipofalla2 = String.Empty;
+                            switch (element.tipoFalla)
+                            {
+                                case "ComunicacionEnergia":
+                                    tipofalla2 = "Sin energía";
+                                    break;
+                                case "ErrorSinEfectivo":
+                                    tipofalla2 = "Sin efectivo";
+                                    break;
+                                case "ModoSupervisor":
+                                    tipofalla2 = "Modo Supervisor";
+                                    break;
+                                case "FallaHardware":
+                                    tipofalla2 = "Falla hardware";
+                                    break;
+                                case "ProblemaLocal":
+                                    tipofalla2 = "Problema local";
+                                    break;
+                                case "TrxsNoMonetarias":
+                                    tipofalla2 = "Trans. no monetarias";
+                                    break;
+                                default:
+                                    tipofalla2 = "Sin identificar";
+                                    break;
+                            }
+                            //var menu = tipofalla2 + ", " + element.fecha+", "+element.folio;
+                            //opt.Add(menu);
+                            menu = "De la empresa "+element.empresa+", del grupo "+element.grupo+", con falla de tipo " + tipofalla2 + ", con fecha del " + element.fecha + ",no. de folio: " + element.folio + ", El responsable es " + element.responsable + ",fecha posible de solucion: " + element.fechasolucion;
+                            await opcionesAcciones3(context, menu, titulo);
                         }
-                        //var menu = tipofalla2 + ", " + element.fecha+", "+element.folio;
-                        //opt.Add(menu);
-                        menu = "Falla de tipo " + tipofalla2 + ", con fecha del " + element.fecha + ",no. de folio: " + element.folio + ", El responsable es " + element.responsable + ",fecha posible de solucion: " + element.fechasolucion;
-                        await opcionesAcciones3(context, menu, titulo);
+
+                        ///await opcionesAcciones_2(context, CajeroOption);
+
+                        //await opcionesAcciones3(context, menu, titulo);
+                        //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
+                        //var activity = context.MakeMessage();
+                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "Quieres información de otro Cajero, Empresa o Grupo. Ejemplos: Estatus NM1520 o Empresa<Nombre Empresa> o Grupo<NombreGrupo>",
+                            Subtitle = "Espero que la información haya sido de utilidad"
+
+                        }.ToAttachment();
+
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+
                     }
-
-                    ///await opcionesAcciones_2(context, CajeroOption);
-
-                    //await opcionesAcciones3(context, menu, titulo);
-                    //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
-                    //var activity = context.MakeMessage();
-                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    var menuHeroCard = new ThumbnailCard
+                    else
                     {
-                        Text = "Para este cajero puede consultar su 'historico' o si desea puede consultar el 'estatus' de  otro cajero",
-                        Subtitle = "Espero que la información haya sido de utilidad"
+                        var activity = context.MakeMessage();
+                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Subtitle = "El cajero " + cajero.ToUpper() + " no tiene fallas",
+                            Text = "Escribe menu para regresar a las opciones de fallas"
+                        }.ToAttachment();
 
-                    }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
 
-                    activity.Attachments = new List<Attachment>();
-                    activity.Attachments.Add(menuHeroCard);
-                    await context.PostAsync(activity);
-
+                        //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar");
+                    }
                 }
-                else
-                {
+                else {
+
                     var activity = context.MakeMessage();
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Subtitle = "El cajero " + cajero.ToUpper() + " no tiene fallas",
-                        Text = "Escribe menu para regresar a las opciones de fallas"
+                        Text = "El cajero " + cajero.ToUpper() + " no tiene fallas recientes"
                     }.ToAttachment();
-
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
                     await context.PostAsync(activity);
-
-                    //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar");
+                    var menuHeroCard2 = new ThumbnailCard
+                    {
+                        Text = "Puedes consultar información de otro Cajero, Empresa o Grupo. Ejemplos: Estatus NM1520 o Empresa<Nombre Empresa> o Grupo<NombreGrupo>"
+                    }.ToAttachment();
+                    activity.Attachments = new List<Attachment>();
+                    activity.Attachments.Add(menuHeroCard2);
+                    await context.PostAsync(activity);
+                    
                 }
-            }
-            else {
-
-                var activity = context.MakeMessage();
-                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                var menuHeroCard = new ThumbnailCard
-                {
-                    //Subtitle = "El cajero " + cajero.ToUpper() + " no se encontro",
-                    Text = "El cajero " + cajero.ToUpper()+" no tiene fallas recientes"
-                }.ToAttachment();
-                activity.Attachments = new List<Attachment>();
-                activity.Attachments.Add(menuHeroCard);
-                await context.PostAsync(activity);
-                var menuHeroCard2 = new ThumbnailCard
-                {
-                    Text = $"Puedes consultar el historico del mismo escribiendo 'historico cajero' o puedes consultar el estatus de otro cajero"
-                }.ToAttachment();
-                activity.Attachments = new List<Attachment>();
-                activity.Attachments.Add(menuHeroCard2);
-                await context.PostAsync(activity);
-                //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
-            }
+        }else{
+                 var activity = context.MakeMessage();
+                 activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                 var menuHeroCard = new ThumbnailCard
+                 {
+                    Text = "No es posible identificar el cajero " + cajero.ToUpper() + " o no pertenece a banca transaccional, las claves se componen de 6 digitos (ejemplos: NM1520, N10251). Escribe nuevamente tu solicitud"
+                 }.ToAttachment();
+                 activity.Attachments = new List<Attachment>();
+                 activity.Attachments.Add(menuHeroCard);
+                 await context.PostAsync(activity);       
+        }
             context.Wait(MessageReceivedAsync);
         }
 
