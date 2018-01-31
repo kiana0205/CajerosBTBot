@@ -1550,7 +1550,7 @@ using Newtonsoft.Json;
             {
                 Program.empresa = obtienemepresa[0].empresa;
                 var conteo = bd.obtenerConteoCajerosEmpresa(Program.empresa.ToUpper());
-                if (conteo == 1)
+                if (conteo >= 1)
                 {
                     var estatus = bd.obtenerEstatusCajerosEmpresa(Program.empresa.ToUpper());
                     if (estatus.Equals(true))
@@ -1559,14 +1559,14 @@ using Newtonsoft.Json;
                         if (empresas != null && empresas.Count > 0)
                         {
                             var activity = context.MakeMessage();
-                            List<object> opt = new List<object>();
+                            //List<object> opt = new List<object>();
                             Int32 tam = Program.empresa.Length;
                             string nombre = null;
                             if (tam > 40) { nombre = Program.empresa.Substring(0, tam - 15); }
                             else if (tam >= 30 && tam < 40) { nombre = Program.empresa.Substring(0, tam - 8); } else { nombre = Program.empresa; }
 
 
-                            var titulo = nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            var titulo = "La empresa "+nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
                             foreach (Empresa element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1594,17 +1594,19 @@ using Newtonsoft.Json;
                                         tipofalla2 = "Sin identificar";
                                         break;
                                 }
-                                var menu = element.cajero + "   " + tipofalla2 + "  " + element.folio;
-                                opt.Add(menu);
+                                string opt;
+                                opt= "El cajero " + element.cajero + "  del grupo "+element.grupo+ ",tiene falla tipo "+tipofalla2 + ", con fecha del "+element.fecha+", con folio " + element.folio+", responsable "+element.responsable+", y fecha posible de solución "+element.fechasolucion;
+                                //var menu = "El cajero "+element.cajero + "   " + tipofalla2 + "  " + element.folio;
+                                //opt.Add(menu);
+                                await opcionesAcciones3(context, opt, titulo);
                             }
 
-                            await opcionesAcciones2(context, opt, titulo);
-                            //var activity = context.MakeMessage();
+                            //await opcionesAcciones2(context, opt, titulo);
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                             var menuHeroCard = new ThumbnailCard
                             {
-                                Text = "Algo más en que le podamos ayudar?",
-                                Subtitle = "Espero que la información sea de su utilidad"
+                                Text = "Puedes consultar información de otra Empresa, Cajero o Grupo. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>",
+                                Subtitle = "Espero que la información haya sido de utilidad"
 
                             }.ToAttachment();
 
@@ -1620,12 +1622,8 @@ using Newtonsoft.Json;
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                             var menuHeroCard = new ThumbnailCard
                             {
-                                Text = "Algo más en que le podamos ayudar?",
-                                Subtitle = "Verifique el nombre de la empresa",
-                                //Title = "No se identifico el cajero como parte de banca transaccional",
-                                //Images = new List<CardImage> {
-                                //new CardImage { Url = "https://storageserviciobt.blob.core.windows.net/imagebot/error.jpg" }
-                                //}
+                                Text = "Puedes consultar Información de otra Empresa, Cajero o Grupo. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                                //Subtitle = "Verifique el nombre de la empresa",   
                             }.ToAttachment();
 
                             activity.Attachments = new List<Attachment>();
@@ -1636,20 +1634,20 @@ using Newtonsoft.Json;
                     else
                     {
                         var activity = context.MakeMessage();
-                        /*   activity.Text = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper();
-                           await context.PostAsync(activity);
-                           await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");*/
-
-
                         activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard = new ThumbnailCard
                         {
-                            Text = "Algo más en que le podamos ayudar?",
-                            Subtitle = "No se encontraron fallas en los cajeros de la empresa " + empresa.ToUpper(),
+                            Text = $"La empresa {Program.empresa} no tiene fallas recientes en los cajeros"
                         }.ToAttachment();
-
                         activity.Attachments = new List<Attachment>();
                         activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                        var menuHeroCard2 = new ThumbnailCard
+                        {
+                            Text = "Quieres Información de otra Empresa, Cajero o Grupo. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard2);
                         await context.PostAsync(activity);
                     }
                 }//fin del id cuando se encutra una empresa
@@ -1666,13 +1664,12 @@ using Newtonsoft.Json;
                     await context.PostAsync(activity);
                     var menuHeroCard2 = new ThumbnailCard
                     {
-                        Text = $"Puedes consultar el historico de la misma escribiendo 'historico empresa' o puedes consultar el estatus de otra empresa"
+                        Text = "Quieres Información de otra Empresa, Cajero o Grupo. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard2);
                     await context.PostAsync(activity);
-                    //await context.PostAsync(Program.empresa);
-
+                    //await context.PostAsync(Program.empresa);                   
                     //await SolicitarEstatusCajerosGrupo(context, Program.empresa);
 
                     //PromptDialog.Choice(context, this.OnOptionSelected2, new List<String> { SiOption, NoOption}, "Quieres buscarlo por grupo?", "Opcion no valida", 3, PromptStyle.Auto);
@@ -1689,12 +1686,12 @@ using Newtonsoft.Json;
                 if (buscaengrupo.Count == 1)
                 {
                     string obj = null;
-                    String titulo = "La empresa como la ingreso no se encontro";
-                    obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
+                    String titulo = "No es posible identificar el elemento como una empresa";
+                    obj = "Pero se encontro una coincidencia con el grupo," + buscaengrupo[0].grupo;
                     await opcionesAcciones3(context, obj, titulo);
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Para consultar el estatus del grupo escriba grupo + nombre del grupo"
+                        Text = "Si quieres información de ese grupo, por favor escribe Grupo <Nombre Grupo>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
@@ -1702,7 +1699,7 @@ using Newtonsoft.Json;
                 else if (buscaengrupo.Count > 1)
                 {
                     List<object> obj = new List<object>();
-                    String titulo = "La empresa no se encontro, pero si coincide con varios grupos";
+                    String titulo = "No es posible identificar el elemento como una empresa, pero coincide con varios grupos";
                     //obj = "Coincide con el grupo," + buscaengrupo[0].grupo;
                     foreach (Grupo grup in buscaengrupo)
                     {
@@ -1711,7 +1708,7 @@ using Newtonsoft.Json;
                     await opcionesAcciones2(context, obj, titulo);
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Para buscarla por grupo escriba grupo + el nombre del grupo"
+                        Text = "Si quiere información de algun grupo, por favor escribe Grupo <Nombre Grupo>"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
@@ -1720,14 +1717,13 @@ using Newtonsoft.Json;
                 {
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "La empresa como la ingreso no se encontro o no pertenece a banca transaccional. vuelva a intentarlo"
+                        Text = "No es posible identificar esa empresa o no pertenece a banca transaccional, verifica el nombre de la Empresa"
                     }.ToAttachment();
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
                 }
 
                 await context.PostAsync(activity);
-
 
             }
             context.Wait(MessageReceivedAsync);

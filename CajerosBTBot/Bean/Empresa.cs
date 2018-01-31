@@ -33,6 +33,8 @@ namespace CajerosBTBot.Bean
         public string Mensaje { get; set; }
 
         public string responsable { get; set; }
+        public string grupo { get; set; }
+        public string fechasolucion { get; set; }
 
     }
 }
