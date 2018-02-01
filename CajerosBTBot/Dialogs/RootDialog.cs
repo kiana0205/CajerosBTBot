@@ -1935,12 +1935,20 @@ using Newtonsoft.Json;
                     activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
-                        Text = "Quieres Información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                        Text = $"El grupo {Program.grupo} no tiene fallas recientes en los cajeros"
                     }.ToAttachment();
+
                     activity.Attachments = new List<Attachment>();
                     activity.Attachments.Add(menuHeroCard);
-
                     await context.PostAsync(activity);
+                    var activity2 = context.MakeMessage();
+                    var menuHeroCard2 = new ThumbnailCard
+                    {
+                        Text = "Quieres Información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>"
+                    }.ToAttachment();
+                    activity2.Attachments = new List<Attachment>();
+                    activity2.Attachments.Add(menuHeroCard2);
+                    await context.PostAsync(activity2);
 
                 }
             }//fin de cuando se encontro el grupo
