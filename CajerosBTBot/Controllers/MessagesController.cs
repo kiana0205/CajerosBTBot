@@ -177,7 +177,7 @@ using System.Web;
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                IConversationUpdateActivity update = message;
+               /* IConversationUpdateActivity update = message;
                 var Client = new ConnectorClient(new Uri(message.ServiceUrl), new MicrosoftAppCredentials());
                 if (update.MembersAdded != null && update.MembersAdded.Any()) {
                     foreach (var newMember in update.MembersAdded) {
@@ -188,11 +188,19 @@ using System.Web;
                             Client.Conversations.ReplyToActivityAsync(reply);
                         }
                     }
+                }*/
+
+
+                if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id))
+                {
+                    var reply = message.CreateReply("Bienvenido. En este lugar podrás conocer información sobre fallas en cajeros. Escribe tu solicitud o escribe 'ayuda'");
+                    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                    connector.Conversations.ReplyToActivityAsync(reply);
                 }
                 //ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
                 //Activity reply = message.CreateReply("Bienvenido al chat de fallas en cajeros. Hola!");
                 //connector.Conversations.ReplyToActivityAsync(reply);
-           
+
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {

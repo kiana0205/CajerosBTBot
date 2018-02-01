@@ -18,8 +18,6 @@ using global::AdaptiveCards;
     using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-
-
     //namespace CajerosBTBot.Dialogs
     //{
     [Serializable]
@@ -27,6 +25,8 @@ using Newtonsoft.Json;
     {
 
         List<string> lista;
+        [NonSerialized]
+        Timer t;
         private const string CajeroOption = "cajeros";
         private const string EmpresaOption = "empresas";
         private const string GrupoOption = "grupos";
@@ -666,6 +666,18 @@ using Newtonsoft.Json;
             var textoDelUsuario = mensaje.Text;
 
 
+            ConversationStarter.toId = mensaje.From.Id;
+            ConversationStarter.toName = mensaje.From.Name;
+            ConversationStarter.fromId = mensaje.Recipient.Id;
+            ConversationStarter.fromName = mensaje.Recipient.Name;
+            ConversationStarter.serviceUrl = mensaje.ServiceUrl;
+            ConversationStarter.channelId = mensaje.ChannelId;
+            ConversationStarter.conversationId = mensaje.Conversation.Id;
+            //t = new Timer(new TimerCallback(timerEvent));
+            //t.Change(5000, Timeout.Infinite);
+
+
+
             if (mensaje.Value != null)
             {
                 dynamic value = mensaje.Value;
@@ -877,7 +889,7 @@ using Newtonsoft.Json;
                         activity3.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard7 = new ThumbnailCard
                         {
-                            Text = "Fue un placer servile...",
+                            Text = "Fue un placer servile vuelva pronto",
                         }.ToAttachment();
 
                         activity3.Attachments = new List<Attachment>();
@@ -899,12 +911,30 @@ using Newtonsoft.Json;
                         await context.PostAsync(activity4);                   
                         await ManejarSaludo(context);
                     }
+                    var activity5 = context.MakeMessage();
+                    activity5.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var menuHeroCard9 = new ThumbnailCard
+                    {
+                        Text = "Fue un placer servile vuelva pronto",
+                    }.ToAttachment();
+
+                    activity5.Attachments = new List<Attachment>();
+                    activity5.Attachments.Add(menuHeroCard9);
+                    await context.PostAsync(activity5);
+                    await ManejarSaludo(context);
                     break;
                 default:
                     await context.PostAsync(intension.ToString());
                     context.Wait(MessageReceivedAsync);
                     break;
             }
+        }
+
+        public void timerEvent(object target)
+        {
+
+            t.Dispose();
+            ConversationStarter.Resume(ConversationStarter.conversationId, ConversationStarter.channelId); //We don't need to wait for this, just want to start the interruption here
         }
 
         //private async Task ManejarSaludo(IDialogContext context)
