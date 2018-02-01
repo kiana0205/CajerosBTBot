@@ -915,7 +915,7 @@ using Newtonsoft.Json;
                     activity5.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard9 = new ThumbnailCard
                     {
-                        Text = "Fue un placer servile vuelva pronto",
+                        Text = "Fue un placer servile. Vuelva pronto",
                     }.ToAttachment();
 
                     activity5.Attachments = new List<Attachment>();
