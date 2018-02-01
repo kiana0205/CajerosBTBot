@@ -753,25 +753,8 @@ using Newtonsoft.Json;
                     await context.PostAsync(activity2);
                     break;
                 case Intensiones.SolicitarEstatusCajero:
-                    /*if (objetoLuis.Entidades[0].entity.Equals("desconocido"))
-                    {                           
-                        var activity = context.MakeMessage();
-                        activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                        var menuHeroCard = new ThumbnailCard
-                        {
-                            Subtitle = "No entendi la solicitud",
-                            Text = "Utiliza la opcion + 'cajero', 'empresa' o 'grupo' + nombre del elemento"
-                        }.ToAttachment();
-
-                        activity.Attachments = new List<Attachment>();
-                        activity.Attachments.Add(menuHeroCard);
-                        await context.PostAsync(activity);
-                    }
-                    else
-                    {*/
                     Program.cajero = objetoLuis.Entidades[0].entity;
                     await SolicitarEstatusCajero(context, Program.cajero);
-                    // }
                     break;
                 case Intensiones.SolicitarEstatusCajerosEmpresa:
                     if (objetoLuis.Entidades[0].entity.Equals("desconocido"))
@@ -884,38 +867,11 @@ using Newtonsoft.Json;
                     await SolicitarResponsableGrupo(context, Program.grupo);
                     break;
                 case Intensiones.SolicitarCerrarDialogo:
-                    /*if (textoDelUsuario.Equals("si")) {
-                        var activity3 = context.MakeMessage();
-                        activity3.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                        var menuHeroCard7 = new ThumbnailCard
-                        {
-                            Text = "Fue un placer servile vuelva pronto",
-                        }.ToAttachment();
-
-                        activity3.Attachments = new List<Attachment>();
-                        activity3.Attachments.Add(menuHeroCard7);
-                        await context.PostAsync(activity3);
-                        //await ManejarSaludo(context);
-                    }
-                    if (textoDelUsuario.Equals("no"))
-                    {
-                        var activity4 = context.MakeMessage();
-                        activity4.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                        var menuHeroCard8 = new ThumbnailCard
-                        {
-                            Text = "Bien! Deseas hacer otra consulta. Te recordamos que ..",
-                        }.ToAttachment();
-
-                        activity4.Attachments = new List<Attachment>();
-                        activity4.Attachments.Add(menuHeroCard8);
-                        await context.PostAsync(activity4);                   
-                        await ManejarSaludo(context);
-                    }*/
                     var activity5 = context.MakeMessage();
                     activity5.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard9 = new ThumbnailCard
                     {
-                        Text = "Fue un placer servile. Vuelva pronto",
+                        Text = "Fue un placer servirte!. Hasta luego, Vuelve pronto!",
                     }.ToAttachment();
 
                     activity5.Attachments = new List<Attachment>();
@@ -939,7 +895,6 @@ using Newtonsoft.Json;
 
         //private async Task ManejarSaludo(IDialogContext context)
         //{
-
         //ManejarAyuda(context);
         //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
         //}
@@ -1009,9 +964,6 @@ using Newtonsoft.Json;
 
             //PromptDialog.Choice(context, this.OnOptionSelected, new List<String> { CajeroOption, EmpresaOption, GrupoOption }, "¿Qué deseas consultar?. Te puedo mostrar información sobre ", "Opcion no valida", 4,PromptStyle.PerLine);
             //PromptDialog.Text(context, this.OnOptionSelected, $"Te puedo mostrar información referente a  {CajeroOption}, {EmpresaOption}, {GrupoOption}. ¿Sobre que deseas consultar?");
-
-
-
         }
         private static async Task SendMenuSelectionAsync2(IDialogContext context, MenuCajeros selecciona)
         {
@@ -1091,7 +1043,6 @@ using Newtonsoft.Json;
 
         private async Task ManejarAyuda(IDialogContext context)
         {
-
             //await context.PostAsync("Has solicitado Ayuda ");
             //MostrarAyuda(context); 
             //PromptDialog.Text(context, RecibirEstadoUsuario, "¿Como se encuentra el día de hoy?");
@@ -1344,8 +1295,6 @@ using Newtonsoft.Json;
 
              await context.PostAsync("¿En que le podemos ayudar?");
          }*/
-
-
         private async Task SolicitarEstatusCajero(IDialogContext context, string cajero) {
             IConsultorDB bd = new CajeroDaoImpl();
             var buscacajero = bd.ObtenerCajero(cajero.ToUpper());
@@ -1406,7 +1355,8 @@ using Newtonsoft.Json;
                         Program.cajero = cajero.ToUpper();
                         string menu = null;
                         List<object> opt = new List<object>();
-                        var titulo = "Se encontraron " + caj.Count + " falla(s) en el cajero " + Program.cajero;
+                        //var titulo = "Se encontraron " + caj.Count + " falla(s) en el cajero " + Program.cajero;
+                        var titulo = "Se encontraron falla(s) en el cajero " + Program.cajero+" en ";
                         foreach (Cajero element in caj)
                         {
                             var tipofalla2 = String.Empty;
@@ -1446,6 +1396,17 @@ using Newtonsoft.Json;
                         //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
                         //var activity = context.MakeMessage();
                         activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+                        var menuHeroCard2 = new ThumbnailCard
+                        {
+                            Text = "Se encontraron " + caj.Count+" fallas en el cajero "+ Program.cajero+" y se muestran arriba"                            
+
+                        }.ToAttachment();
+
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard2);
+                        await context.PostAsync(activity);
+
                         var menuHeroCard = new ThumbnailCard
                         {
                             Text = "Quieres información de otro Cajero, Empresa o Grupo. Ejemplos: Estatus NM1520 o Empresa<Nombre Empresa> o Grupo<NombreGrupo>",
@@ -1596,7 +1557,8 @@ using Newtonsoft.Json;
                             else if (tam >= 30 && tam < 40) { nombre = Program.empresa.Substring(0, tam - 8); } else { nombre = Program.empresa; }
 
 
-                            var titulo = "La empresa "+nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            //var titulo = "La empresa "+nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            var titulo = "La empresa " + nombre + " tiene  cajeros con fallas. ";
                             foreach (Empresa element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1625,7 +1587,7 @@ using Newtonsoft.Json;
                                         break;
                                 }
                                 string opt;
-                                opt= "El cajero " + element.cajero + "  del grupo "+element.grupo+ ",tiene falla tipo "+tipofalla2 + ", con fecha del "+element.fecha+", con folio " + element.folio+", responsable "+element.responsable+", y fecha posible de solución "+element.fechasolucion;
+                                opt= "En el cajero " + element.cajero + "  del grupo "+element.grupo+ ",tiene falla tipo "+tipofalla2 + ", con fecha del "+element.fecha+", con folio " + element.folio+", responsable "+element.responsable+", y fecha posible de solución "+element.fechasolucion;
                                 //var menu = "El cajero "+element.cajero + "   " + tipofalla2 + "  " + element.folio;
                                 //opt.Add(menu);
                                 await opcionesAcciones3(context, opt, titulo);
@@ -1633,6 +1595,14 @@ using Newtonsoft.Json;
 
                             //await opcionesAcciones2(context, opt, titulo);
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                            var menuHeroCard2 = new ThumbnailCard
+                            {
+                                Text = "La empresa "+nombre + " tiene " + empresas.Count + " cajeros con fallas y se muestran arriba "
+
+                            }.ToAttachment();
+
+                            activity.Attachments = new List<Attachment>();
+                            activity.Attachments.Add(menuHeroCard2);
                             var menuHeroCard = new ThumbnailCard
                             {
                                 Text = "Puedes consultar información de otra Empresa, Cajero o Grupo. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>",
@@ -1834,7 +1804,8 @@ using Newtonsoft.Json;
                             if (tam >= 40) { nombre = Program.grupo.Substring(0, tam - 15); }
                             else if (tam >= 30 && tam < 40) { nombre = Program.grupo.Substring(0, tam - 8); } else { nombre = Program.grupo; }
 
-                            var titulo = "El grupo " + nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            //var titulo = "El grupo " + nombre + " tiene " + empresas.Count + " cajeros con fallas: ";
+                            var titulo = "El grupo " + nombre + " tiene cajeros con fallas: ";
                             foreach (Grupo element in empresas)
                             {
                                 var tipofalla2 = String.Empty;
@@ -1871,7 +1842,7 @@ using Newtonsoft.Json;
 
                                 //var menu = nombre2.ToLower()+","+element.cajero + "," + tipofalla2 + "," + element.folio;
                                 //var menu = "La empresa"+nombre2.ToLower() + "," + element.cajero + ", de tipo " + tipofalla2;
-                                opt = "El cajero " + element.cajero + "  de la empresa " + element.empresa + ",tiene falla tipo " + tipofalla2 + ", con fecha del " + element.fecha + ", con folio " + element.folio + ", responsable " + element.responsable + ", y fecha posible de solución " + element.fechasolucion;
+                                opt = "En el cajero " + element.cajero + "  de la empresa " + element.empresa + ",tiene falla tipo " + tipofalla2 + ", con fecha del " + element.fecha + ", con folio " + element.folio + ", responsable " + element.responsable + ", y fecha posible de solución " + element.fechasolucion;
                                 //opt.Add(menu);
                                 await opcionesAcciones3(context, opt, titulo);
                             }
@@ -1881,6 +1852,13 @@ using Newtonsoft.Json;
                             //await context.PostAsync("Espero que la información haya sido de utilidad. Algo más en que le podamos ayudar?");
                             //var activity = context.MakeMessage();
                             activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                            var menuHeroCard2 = new ThumbnailCard
+                            {
+                                Text = "El grupo " + nombre + " tiene " + empresas.Count + " cajeros con fallas y se muestran en la parte de arriba"
+                            }.ToAttachment();
+
+                            activity.Attachments = new List<Attachment>();
+                            activity.Attachments.Add(menuHeroCard2);
                             var menuHeroCard = new ThumbnailCard
                             {
                                 Text = "Puedes consultar información de otro Grupo, Cajero o Empresa. Ejemplos: Estatus NM1520 o Empresa <Nombre empresa> o Grupo <Nombre  Grupo>",

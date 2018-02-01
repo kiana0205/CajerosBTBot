@@ -193,7 +193,7 @@ using System.Web;
 
                 if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id))
                 {
-                    var reply = message.CreateReply("Bienvenido. En este lugar podrás conocer información sobre fallas en cajeros. Escribe tu solicitud o escribe 'ayuda'");
+                    var reply = message.CreateReply("Bienvenido. En este lugar podrás conocer información sobre fallas en cajeros. Escribe tu solicitud o escribe 'ayuda' para brindarte información");
                     ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
                     connector.Conversations.ReplyToActivityAsync(reply);
                 }
