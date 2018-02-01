@@ -884,7 +884,7 @@ using Newtonsoft.Json;
                     await SolicitarResponsableGrupo(context, Program.grupo);
                     break;
                 case Intensiones.SolicitarCerrarDialogo:
-                    if (textoDelUsuario.Equals("si")) {
+                    /*if (textoDelUsuario.Equals("si")) {
                         var activity3 = context.MakeMessage();
                         activity3.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                         var menuHeroCard7 = new ThumbnailCard
@@ -910,7 +910,7 @@ using Newtonsoft.Json;
                         activity4.Attachments.Add(menuHeroCard8);
                         await context.PostAsync(activity4);                   
                         await ManejarSaludo(context);
-                    }
+                    }*/
                     var activity5 = context.MakeMessage();
                     activity5.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard9 = new ThumbnailCard
