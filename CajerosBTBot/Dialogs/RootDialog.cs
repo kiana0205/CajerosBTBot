@@ -1829,6 +1829,7 @@ using Newtonsoft.Json;
                 {
                     cnt = 0;
                     List<object> opt = new List<object>();
+                    List<CardAction> messageOptions = new List<CardAction>();
                     var titulo = "Las coincidencias encontradas con " + grupo.ToUpper() + " son";
                     foreach (Grupo element in obtienemepresa)
                     {
@@ -1838,19 +1839,35 @@ using Newtonsoft.Json;
                         else if (tam >= 40 && tam < 50) { nombre = element.grupo.Substring(0, tam - 10); } else { nombre = element.grupo; }
                         var menu = nombre;
                         //var menu = element.grupo;
-                        opt.Add(menu);
+                        //opt.Add(menu);
+                        messageOptions.Add(new CardAction
+                        {
+                            Title = nombre,
+                            Value = "grupo " + nombre,
+                            Type = "postBack",
+
+                        });
                     }
-                    await opcionesAcciones2(context, opt, titulo);
+                    //await opcionesAcciones2(context, opt, titulo);
+
 
                     var activity = context.MakeMessage();
-                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    var card = new HeroCard
+                    {
+                        Text = titulo,
+                        Buttons = messageOptions
+                    };
+                    var card2 = card.ToAttachment();
+                    
+                    activity.Attachments.Add(card2);
+                    /*activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     var menuHeroCard = new ThumbnailCard
                     {
                         Text = "Para consultar algun grupo proporciona 'grupo' <Nombre Grupo> que desea consultar ",
                     }.ToAttachment();
 
                     activity.Attachments = new List<Attachment>();
-                    activity.Attachments.Add(menuHeroCard);
+                    activity.Attachments.Add(menuHeroCard);*/
                     await context.PostAsync(activity);
                 }
             }//fin del if cuando se encuentra mas de una empresa
