@@ -24,15 +24,13 @@ using Newtonsoft.Json;
     public class RootDialog : IDialog<object>
     {
 
-        List<string> lista;
+        //List<string> lista;
         [NonSerialized]
         Timer t;
         private const string CajeroOption = "cajeros";
         private const string EmpresaOption = "empresas";
         private const string GrupoOption = "grupos";
 
-        //private const string SiOption = "si";
-        //private const string NoOption = "no";
         public static Int32 cnt = 0;
         public static class Program {
             public static string cajero;
@@ -208,12 +206,11 @@ using Newtonsoft.Json;
 
             var reply = context.MakeMessage();
             reply.Attachments.Add(attachment);
-
             await context.PostAsync(reply);
-
             context.Wait(MessageReceivedAsync);
         }
 
+        
 
         private static AdaptiveCard GetCajeroSearchCard()
         {
@@ -712,7 +709,7 @@ using Newtonsoft.Json;
                     case "Menu":
                         await ManejarSaludo(context);
                         return;
-                    case "MenuCajeroSelection":
+                    case "MenuEmpresaSelection":
                         await SendMenuSelectionAsync2(context, (MenuCajeros)JsonConvert.DeserializeObject<MenuCajeros>(value.ToString()));
                         //await opcionesAcciones(context, EmpresaOption);
                         //context.Wait(MessageReceivedAsync);
@@ -969,6 +966,7 @@ using Newtonsoft.Json;
         {
             //var description = $"{hotel.Rating} start with {hotel.NumberOfReviews}. From ${hotel.PriceStarting} per night.";
             Program.empresa = selecciona.opcion;
+           
 
         }
 
@@ -1029,8 +1027,64 @@ using Newtonsoft.Json;
 
         private async Task OnOptionSelected2(IDialogContext context, IAwaitable<string> result)
         {
-            var confirm = await result;
-            context.Done(confirm);
+            //var confirm = await result;
+            //context.Done(confirm);
+            try
+            {
+                string optionSelected = await result;
+                
+                var activity = context.MakeMessage();
+                activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                switch (optionSelected)
+                {
+                    case CajeroOption:
+                        Program.estatus = CajeroOption;
+                        Program.historico = CajeroOption;
+                        await opcionesAcciones(context, CajeroOption);
+                        var menuHeroCard = new ThumbnailCard
+                        {
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el id del cajero"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard);
+                        await context.PostAsync(activity);
+                        //await context.PostAsync($"Que deseas consultar del {CajeroOption}?..");
+                        break;
+                    case EmpresaOption:
+                        Program.estatus = EmpresaOption;
+                        Program.historico = EmpresaOption;
+                        await opcionesAcciones(context, EmpresaOption);
+                        var menuHeroCard2 = new ThumbnailCard
+                        {
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el nombre de la empresa"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard2);
+                        await context.PostAsync(activity);
+                        //await context.PostAsync($"Que deseas consultar de la {EmpresaOption}?..");
+                        break;
+                    case GrupoOption:
+                        Program.estatus = GrupoOption;
+                        Program.historico = GrupoOption;
+                        await opcionesAcciones(context, GrupoOption);
+                        var menuHeroCard3 = new ThumbnailCard
+                        {
+                            Text = "Si deseas hacer una consulta por favor proporciona la opción deseada + el nombre del grupo"
+                        }.ToAttachment();
+                        activity.Attachments = new List<Attachment>();
+                        activity.Attachments.Add(menuHeroCard3);
+                        await context.PostAsync(activity);
+                        //await context.PostAsync($"Que deseas consultar del {GrupoOption}?..");
+                        break;
+
+                }
+
+            }
+            catch (TooManyAttemptsException)
+            {
+                await context.PostAsync($"Muchas peticiones ");
+                context.Wait(this.MessageReceivedAsync);
+            }
 
         }
 
@@ -1211,7 +1265,7 @@ using Newtonsoft.Json;
 
         private Column AsHotelItem(MenuCajeros menu)
         {
-            var submitActionData = JObject.Parse("{ \"Type\": \"MenuCajeroSelection\" }");
+            var submitActionData = JObject.Parse("{ \"Type\": \"MenuEmpresaSelection\" }");
             submitActionData.Merge(JObject.FromObject(menu));
             return new Column()
             {
@@ -1478,6 +1532,7 @@ using Newtonsoft.Json;
             StringBuilder sb = new StringBuilder();
             if (obtienemepresa.Count > 1)
             {
+                //PromptDialog.Choice(context, this.OnOptionSelected2, opt, "Las coincidencias encontradas son " + empresa.ToUpper(), "Opcion no valida", 3, PromptStyle.Auto);
                 if (obtienemepresa.Count > 15 && cnt == 0)
                 {
                     cnt++;
@@ -1492,8 +1547,6 @@ using Newtonsoft.Json;
                     activity2.Attachments = new List<Attachment>();
                     activity2.Attachments.Add(menuHeroCard2);
                     await context.PostAsync(activity2);
-
-
                 }
                 else
                 {
@@ -1509,6 +1562,8 @@ using Newtonsoft.Json;
                      activity.Attachments.Add(result);
                      await context.PostAsync(activity);
                      //context.Wait(ConnectOption);*/
+                    //List<string> opt = new List<string>();
+                    List<CardAction> messageOptions = new List<CardAction>();
                     List<object> opt = new List<object>();
                     var titulo = "Las coincidencias encontradas son " + empresa.ToUpper();
                     foreach (Empresa element in obtienemepresa)
@@ -1519,21 +1574,38 @@ using Newtonsoft.Json;
                         else if (tam >= 40 && tam < 50) { nombre = element.empresa.Substring(0, tam - 10
                             ); } else { nombre = element.empresa; }
                         //var menu = element.empresa.Substring(tam);
-                        var menu = nombre;
-                        opt.Add(menu);
+                        messageOptions.Add(new CardAction
+                        {
+                            Title = nombre,
+                            Value = "empresa "+nombre,
+                            Type = "postBack",
 
+                        });
+                        //var menu = nombre;
+                        //opt.Add(menu);
+                        
                     }
-                    await opcionesAcciones2(context, opt, titulo);
+                    var card = new HeroCard
+                    {
+                        Text = titulo,                         
+                        Buttons = messageOptions
+                    };
+                    var card2=card.ToAttachment();
+                    //await opcionesAcciones2(context, opt, titulo);
+                    // PromptDialog.Choice(context, OnOptionSelected2, "Las coincidencias encontradas son " + empresa.ToUpper(), "Opcion no valida", 3, PromptStyle.Auto);
+
 
                     var activity = context.MakeMessage();
-                    activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                    var menuHeroCard = new ThumbnailCard
-                    {
-                        Text = "Para consultar alguna proporciona 'empresa' + nombre de la empresa que desea",
-                    }.ToAttachment();
+                    activity.Attachments.Add(card2);
 
-                    activity.Attachments = new List<Attachment>();
-                    activity.Attachments.Add(menuHeroCard);
+                    //activity.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    //var menuHeroCard = new ThumbnailCard
+                   // {
+                     //   Text = "Para consultar alguna proporciona 'empresa' + nombre de la empresa que desea",
+                    //}.ToAttachment();
+
+                    //activity.Attachments = new List<Attachment>();
+                    //activity.Attachments.Add(menuHeroCard);
                     await context.PostAsync(activity);
                 }
             }//fin del if cuando se encuentra mas de una empresa
